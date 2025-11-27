@@ -2,5 +2,5 @@ spec:
   destination:
     server: https://kubernetes.default.svc
   source:
-    repoURL: https://github.com/mshykhov/example-infrastructure.git
-    targetRevision: main
+    repoURL: git@github.com:mshykhov/example-infrastructure.git
+    targetRevision: master
