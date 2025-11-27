@@ -1,0 +1,53 @@
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build
+dist/
+build/
+out/
+target/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+.Python
+
+# Java/Kotlin
+*.class
+*.jar
+*.war
+
+# Coverage
+coverage/
+.nyc_output/
+*.lcov
+
+# Temp
+*.tmp
+*.temp
+*.swp
+*~
