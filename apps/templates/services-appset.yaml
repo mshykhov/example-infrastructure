@@ -12,20 +12,22 @@ spec:
     - git:
         repoURL: git@github.com:mshykhov/example-deploy.git
         revision: HEAD
-        files:
-          - path: "services/**/config.json"
+        directories:
+          - path: services/*
+          - path: services/_*
+            exclude: true
   template:
     metadata:
-      name: '{{`{{ .name }}`}}'
+      name: '{{`{{ .path.basename }}`}}'
     spec:
-      project: '{{`{{ .project }}`}}'
+      project: default
       source:
         repoURL: git@github.com:mshykhov/example-deploy.git
         targetRevision: HEAD
-        path: '{{`{{ .chartPath }}`}}'
+        path: '{{`{{ .path.path }}`}}'
       destination:
         server: {{ .Values.spec.destination.server }}
-        namespace: '{{`{{ .namespace }}`}}'
+        namespace: '{{`{{ .path.basename }}`}}'
       syncPolicy:
         automated:
           prune: true
