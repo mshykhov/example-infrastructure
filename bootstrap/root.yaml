@@ -17,7 +17,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/mshykhov/test-infrastructure.git
+    repoURL: https://github.com/mshykhov/example-infrastructure.git
     targetRevision: main
     path: apps
   destination:

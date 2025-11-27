@@ -51,3 +51,9 @@ coverage/
 *.temp
 *.swp
 *~
+
+# Secrets - NEVER commit!
+*-secret.yaml
+*-secrets.yaml
+*.key
+*.pem
