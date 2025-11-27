@@ -57,3 +57,4 @@ coverage/
 *-secrets.yaml
 *.key
 *.pem
+.claude/
