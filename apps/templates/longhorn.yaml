@@ -1,0 +1,31 @@
+# Longhorn - Distributed block storage for Kubernetes
+# Docs: https://longhorn.io/
+# Requires: Kubernetes >= 1.25
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: longhorn
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://charts.longhorn.io
+    chart: longhorn
+    targetRevision: "1.10.1"
+    helm:
+      values: |
+        preUpgradeChecker:
+          jobEnabled: false
+  destination:
+    server: {{ .Values.spec.destination.server }}
+    namespace: longhorn-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

@@ -1,0 +1,25 @@
+# MetalLB Configuration (IPAddressPool + L2Advertisement)
+# Applied after MetalLB CRDs are ready
+# Docs: https://metallb.io/configuration/
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: metallb-config
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: {{ .Values.spec.source.repoURL }}
+    targetRevision: {{ .Values.spec.source.targetRevision }}
+    path: manifests/metallb-config
+  destination:
+    server: {{ .Values.spec.destination.server }}
+    namespace: metallb-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
