@@ -1,4 +1,4 @@
-# Test Infrastructure
+# Example Infrastructure
 
 GitOps infrastructure. App-of-Apps pattern.
 
