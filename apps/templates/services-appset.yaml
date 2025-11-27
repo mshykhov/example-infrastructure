@@ -22,7 +22,7 @@ spec:
       source:
         repoURL: git@github.com:mshykhov/example-deploy.git
         targetRevision: HEAD
-        path: '{{`{{ .path.path | dir }}`}}'
+        path: '{{`{{ .path }}`}}'
       destination:
         server: {{ .Values.spec.destination.server }}
         namespace: '{{`{{ .namespace }}`}}'
