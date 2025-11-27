@@ -1,6 +1,5 @@
 # Longhorn - Distributed block storage for Kubernetes
-# Docs: https://longhorn.io/
-# Requires: Kubernetes >= 1.25
+# Docs: https://longhorn.io/docs/1.10.1/deploy/install/install-with-argocd/
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
