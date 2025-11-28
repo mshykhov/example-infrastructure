@@ -1,4 +1,6 @@
-# Root Application (App-of-Apps)
+# =============================================================================
+# ROOT APPLICATION (App-of-Apps)
+# =============================================================================
 # This is the ONLY manifest applied manually after ArgoCD installation.
 # Everything else is managed by ArgoCD automatically.
 #
@@ -6,7 +8,7 @@
 #
 # Usage:
 #   kubectl apply -f bootstrap/root.yaml
-#
+# =============================================================================
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -17,8 +19,12 @@ metadata:
 spec:
   project: default
   source:
+    # CHANGE: Your GitHub repository URL (SSH format)
+    # Format: git@github.com:<username>/<repo>.git
     repoURL: git@github.com:mshykhov/example-infrastructure.git
+    # CHANGE: Branch name
     targetRevision: master
+    # Keep as-is: path to apps Helm chart
     path: apps
   destination:
     server: https://kubernetes.default.svc

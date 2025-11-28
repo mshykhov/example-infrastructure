@@ -1,0 +1,31 @@
+# =============================================================================
+# CLUSTER SECRET STORE - DOPPLER (dev environment)
+# =============================================================================
+# Docs: https://external-secrets.io/latest/provider/doppler/
+#
+# Prerequisites:
+#   1. Create Doppler account: https://dashboard.doppler.com
+#   2. Create project and config (e.g., project: "example", config: "dev")
+#   3. Generate Service Token in Doppler (Access tab → Service Tokens)
+#   4. Create K8s secret with token:
+#      kubectl create secret generic doppler-token-dev \
+#        --namespace external-secrets \
+#        --from-literal=dopplerToken="dp.st.dev.XXXX"
+# =============================================================================
+apiVersion: external-secrets.io/v1
+kind: ClusterSecretStore
+metadata:
+  # CHANGE: Name pattern: doppler-<environment>
+  name: doppler-dev
+spec:
+  provider:
+    doppler:
+      auth:
+        secretRef:
+          dopplerToken:
+            # CHANGE: Must match the secret name created in step 4
+            name: doppler-token-dev
+            # Keep as-is: namespace where ESO is installed
+            namespace: external-secrets
+            # Keep as-is: key name in the secret
+            key: dopplerToken

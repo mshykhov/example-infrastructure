@@ -1,32 +1,50 @@
+# =============================================================================
+# APPLICATIONSET - AUTO-DISCOVER SERVICES
+# =============================================================================
+# Docs: https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/Generators-Git/
+#
+# Automatically creates ArgoCD Application for each folder in services/*
+# of the deploy repository.
+#
+# To add new service: just create folder in example-deploy/services/<name>/
+# =============================================================================
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
   name: services
   namespace: argocd
   annotations:
+    # Wave 100: deploy services after all infrastructure
     argocd.argoproj.io/sync-wave: "100"
 spec:
   goTemplate: true
   goTemplateOptions: ["missingkey=error"]
   generators:
     - git:
-        repoURL: git@github.com:mshykhov/example-deploy.git
-        revision: HEAD
+        # Deploy repo from values.yaml
+        repoURL: {{ .Values.deploy.repoURL }}
+        revision: {{ .Values.deploy.targetRevision }}
         directories:
+          # Scan all folders in services/
           - path: services/*
+          # Exclude folders starting with _ (like _library)
           - path: services/_*
             exclude: true
   template:
     metadata:
+      # Auto-generated from folder name (e.g., "example-api")
       name: '{{`{{ .path.basename }}`}}'
     spec:
       project: default
       source:
-        repoURL: git@github.com:mshykhov/example-deploy.git
-        targetRevision: HEAD
+        # Deploy repo from values.yaml
+        repoURL: {{ .Values.deploy.repoURL }}
+        targetRevision: {{ .Values.deploy.targetRevision }}
+        # Auto-generated path (e.g., "services/example-api")
         path: '{{`{{ .path.path }}`}}'
       destination:
         server: {{ .Values.spec.destination.server }}
+        # Auto-generated namespace = folder name
         namespace: '{{`{{ .path.basename }}`}}'
       syncPolicy:
         automated:

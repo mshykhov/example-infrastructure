@@ -1,19 +1,28 @@
-# Longhorn - Distributed block storage for Kubernetes
+# =============================================================================
+# LONGHORN - DISTRIBUTED BLOCK STORAGE FOR KUBERNETES
+# =============================================================================
 # Docs: https://longhorn.io/docs/1.10.1/deploy/install/install-with-argocd/
+#
+# Provides persistent volumes with replication.
+# No changes needed - uses official Helm chart.
+# =============================================================================
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: longhorn
   namespace: argocd
   annotations:
+    # Wave 3: storage
     argocd.argoproj.io/sync-wave: "3"
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   source:
+    # Official Helm chart - no changes needed
     repoURL: https://charts.longhorn.io
     chart: longhorn
+    # OPTIONAL: Update version as needed
     targetRevision: "1.10.1"
     helm:
       values: |

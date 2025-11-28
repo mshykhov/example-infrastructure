@@ -1,6 +1,21 @@
+# =============================================================================
+# GLOBAL VALUES - CHANGE THESE FOR YOUR SETUP
+# =============================================================================
 spec:
   destination:
+    # K8s API server (usually keep as-is)
     server: https://kubernetes.default.svc
   source:
+    # CHANGE: Your infrastructure repository URL (SSH format)
     repoURL: git@github.com:mshykhov/example-infrastructure.git
+    # CHANGE: Branch name
     targetRevision: master
+
+# =============================================================================
+# DEPLOY REPOSITORY - contains service Helm charts
+# =============================================================================
+deploy:
+  # CHANGE: Your deploy repository URL (SSH format)
+  repoURL: git@github.com:mshykhov/example-deploy.git
+  # CHANGE: Branch name
+  targetRevision: master
