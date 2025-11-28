@@ -54,7 +54,7 @@ coverage/
 
 # Secrets - NEVER commit!
 *-secret.yaml
-*-secrets.yaml
+# *-secrets.yaml исключено - конфликтует с external-secrets.yaml
 *.key
 *.pem
 .claude/
