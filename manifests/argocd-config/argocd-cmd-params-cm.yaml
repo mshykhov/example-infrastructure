@@ -1,0 +1,30 @@
+# =============================================================================
+# ARGOCD COMMAND PARAMETERS CONFIGMAP
+# =============================================================================
+# Docs: https://argo-cd.readthedocs.io/en/stable/operator-manual/argocd-cmd-params-cm.yaml/
+#
+# Official way to configure ArgoCD components via command-line parameters.
+# This ConfigMap is watched by ArgoCD and changes are applied automatically.
+# =============================================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-cmd-params-cm
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: argocd-cmd-params-cm
+    app.kubernetes.io/part-of: argocd
+data:
+  # ---------------------------------------------------------------------------
+  # REPO SERVER SETTINGS
+  # ---------------------------------------------------------------------------
+  # Timeout for repo server calls from controller (default 60)
+  # Increase if you see "context deadline exceeded" errors
+  controller.repo.server.timeout.seconds: "180"
+
+  # Timeout for repo server calls from server (default 60)
+  server.repo.server.timeout.seconds: "180"
+
+  # Limit on number of concurrent manifest generations (default 1)
+  # Increase if repo-server has enough resources
+  reposerver.parallelism.limit: "2"
