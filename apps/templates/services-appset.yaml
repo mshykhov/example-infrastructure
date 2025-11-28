@@ -1,17 +1,15 @@
 # =============================================================================
-# APPLICATIONSET - AUTO-DISCOVER SERVICES
+# APPLICATIONSET - ALL SERVICES × ALL ENVIRONMENTS
 # =============================================================================
-# Docs: https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/Generators-Git/
+# Docs: https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/Generators-Matrix/
+# Image Updater: https://argocd-image-updater.readthedocs.io/
 #
-# Automatically creates ArgoCD Application for each folder in services/*
-# of the deploy repository.
+# Matrix Generator creates: services/* × environments (dev, prd)
+# Result: example-api-dev, example-api-prd, etc.
 #
-# To add new service: just create folder in example-deploy/services/<name>/
-#
-# Image Updater annotations:
-# - Monitors Docker Hub for new semver tags
-# - Updates image.tag parameter in Helm values
-# - Uses argocd write-back method (no git commits needed)
+# Workflow:
+#   v0.1.0-rc.1 -> builds -> DEV auto-deploy (constraint ~0-0 includes pre-release)
+#   v0.1.0      -> builds -> PRD auto-deploy (constraint ~0 stable only)
 # =============================================================================
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
@@ -19,55 +17,69 @@ metadata:
   name: services
   namespace: argocd
   annotations:
-    # Wave 100: deploy services after all infrastructure
     argocd.argoproj.io/sync-wave: "100"
 spec:
   goTemplate: true
   goTemplateOptions: ["missingkey=error"]
   generators:
-    - git:
-        # Deploy repo from values.yaml
-        repoURL: {{ .Values.deploy.repoURL }}
-        revision: {{ .Values.deploy.targetRevision }}
-        directories:
-          # Scan all folders in services/
-          - path: services/*
-          # Exclude folders starting with _ (like _library)
-          - path: services/_*
-            exclude: true
+    - matrix:
+        generators:
+          # Environments
+          - list:
+              elements:
+                - env: dev
+                  # ~0-0: includes pre-release versions (0.1.0-rc.1, 0.1.0-beta.2)
+                  imageConstraint: "~0-0"
+                - env: prd
+                  # ~0: stable versions only (0.1.0, 0.2.0)
+                  imageConstraint: "~0"
+          # Services from deployment repository
+          - git:
+              repoURL: {{ .Values.deploy.repoURL }}
+              revision: {{ .Values.deploy.targetRevision }}
+              directories:
+                - path: services/*
+                - path: services/_*
+                  exclude: true
   template:
     metadata:
-      # Auto-generated from folder name (e.g., "example-api")
-      name: '{{`{{ .path.basename }}`}}'
+      name: '{{`{{ .path.basename }}`}}-{{`{{ .env }}`}}'
+      labels:
+        app: '{{`{{ .path.basename }}`}}'
+        env: '{{`{{ .env }}`}}'
       annotations:
         # =================================================================
-        # ArgoCD Image Updater Configuration
-        # Docs: https://argocd-image-updater.readthedocs.io/
+        # ArgoCD Image Updater
+        # Docs: https://argocd-image-updater.readthedocs.io/en/stable/basics/update-strategies/
         # =================================================================
-        # Image to track: alias=image:constraint
-        # - Constraint ~0 = any 0.x.x version (semver)
-        argocd-image-updater.argoproj.io/image-list: 'app={{ .Values.dockerhub.username }}/{{`{{ .path.basename }}`}}:~0'
-        # Update strategy: semver (follows semantic versioning)
+        argocd-image-updater.argoproj.io/image-list: 'app={{ .Values.dockerhub.username }}/{{`{{ .path.basename }}`}}:{{`{{ .imageConstraint }}`}}'
         argocd-image-updater.argoproj.io/app.update-strategy: semver
-        # Helm parameter for image tag
         argocd-image-updater.argoproj.io/app.helm.image-tag: image.tag
-        # Write-back method: argocd (updates Application spec, no git commits)
         argocd-image-updater.argoproj.io/write-back-method: argocd
     spec:
       project: default
       source:
-        # Deploy repo from values.yaml
         repoURL: {{ .Values.deploy.repoURL }}
         targetRevision: {{ .Values.deploy.targetRevision }}
-        # Auto-generated path (e.g., "services/example-api")
         path: '{{`{{ .path.path }}`}}'
+        helm:
+          valueFiles:
+            - values.yaml
+            - 'values-{{`{{ .env }}`}}.yaml'
+          valuesObject:
+            imagePullSecrets:
+              - name: dockerhub-credentials
       destination:
         server: {{ .Values.spec.destination.server }}
-        # Auto-generated namespace = folder name
-        namespace: '{{`{{ .path.basename }}`}}'
+        namespace: '{{`{{ .path.basename }}`}}-{{`{{ .env }}`}}'
       syncPolicy:
         automated:
           prune: true
           selfHeal: true
+        managedNamespaceMetadata:
+          labels:
+            app: '{{`{{ .path.basename }}`}}'
+            env: '{{`{{ .env }}`}}'
+            dockerhub-pull: "true"
         syncOptions:
           - CreateNamespace=true
