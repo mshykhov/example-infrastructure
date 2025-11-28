@@ -15,6 +15,11 @@ metadata:
   name: example-api
 spec:
   namespace: argocd
+  writeBackConfig:
+    method: "git:secret:argocd/git-creds"
+    gitConfig:
+      branch: master
+      writeBackTarget: "helmvalues"
   applicationRefs:
     # DEV: includes pre-release versions (0.1.0-rc.1, 0.1.0-beta.2)
     - namePattern: "example-api-dev"
