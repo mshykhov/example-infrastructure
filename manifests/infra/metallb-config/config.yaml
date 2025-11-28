@@ -1,0 +1,30 @@
+# =============================================================================
+# METALLB CONFIGURATION
+# =============================================================================
+# Docs: https://metallb.io/configuration/
+#
+# CHANGE: Adjust IP range to match your network!
+# - Must be in the same subnet as your nodes
+# - Must be outside DHCP range to avoid conflicts
+# - Example for 192.168.1.0/24: use 192.168.1.240-192.168.1.250
+# =============================================================================
+---
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: default-pool
+  namespace: metallb-system
+spec:
+  addresses:
+    # CHANGE: IP range for LoadBalancer services
+    # Format: <start-ip>-<end-ip>
+    - 192.168.8.240-192.168.8.250
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: default
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+    - default-pool
