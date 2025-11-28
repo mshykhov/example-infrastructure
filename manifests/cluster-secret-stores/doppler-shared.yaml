@@ -1,0 +1,28 @@
+# =============================================================================
+# CLUSTER SECRET STORE - DOPPLER (shared config)
+# =============================================================================
+# Docs: https://external-secrets.io/latest/provider/doppler/
+#
+# For secrets shared across all environments (DockerHub, etc.)
+#
+# Prerequisites:
+#   1. Create Doppler config "shared" in project "example"
+#   2. Generate Service Token in Doppler (Access tab → Service Tokens)
+#   3. Create K8s secret with token:
+#      kubectl create secret generic doppler-token-shared \
+#        --namespace external-secrets \
+#        --from-literal=dopplerToken="dp.st.shared.XXXX"
+# =============================================================================
+apiVersion: external-secrets.io/v1
+kind: ClusterSecretStore
+metadata:
+  name: doppler-shared
+spec:
+  provider:
+    doppler:
+      auth:
+        secretRef:
+          dopplerToken:
+            name: doppler-token-shared
+            namespace: external-secrets
+            key: dopplerToken
