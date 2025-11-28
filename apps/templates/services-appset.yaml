@@ -7,6 +7,11 @@
 # of the deploy repository.
 #
 # To add new service: just create folder in example-deploy/services/<name>/
+#
+# Image Updater annotations:
+# - Monitors Docker Hub for new semver tags
+# - Updates image.tag parameter in Helm values
+# - Uses argocd write-back method (no git commits needed)
 # =============================================================================
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
@@ -34,6 +39,20 @@ spec:
     metadata:
       # Auto-generated from folder name (e.g., "example-api")
       name: '{{`{{ .path.basename }}`}}'
+      annotations:
+        # =================================================================
+        # ArgoCD Image Updater Configuration
+        # Docs: https://argocd-image-updater.readthedocs.io/
+        # =================================================================
+        # Image to track: alias=image:constraint
+        # - Constraint ~0 = any 0.x.x version (semver)
+        argocd-image-updater.argoproj.io/image-list: 'app={{ .Values.dockerhub.username }}/{{`{{ .path.basename }}`}}:~0'
+        # Update strategy: semver (follows semantic versioning)
+        argocd-image-updater.argoproj.io/app.update-strategy: semver
+        # Helm parameter for image tag
+        argocd-image-updater.argoproj.io/app.helm.image-tag: image.tag
+        # Write-back method: argocd (updates Application spec, no git commits)
+        argocd-image-updater.argoproj.io/write-back-method: argocd
     spec:
       project: default
       source:

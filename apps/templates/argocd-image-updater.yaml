@@ -1,0 +1,48 @@
+# =============================================================================
+# ARGOCD IMAGE UPDATER - AUTOMATIC CONTAINER IMAGE UPDATES
+# =============================================================================
+# Docs: https://argocd-image-updater.readthedocs.io/
+# Chart: https://github.com/argoproj/argo-helm/tree/main/charts/argocd-image-updater
+#
+# Monitors container registries for new image versions and updates
+# ArgoCD Applications automatically based on annotations.
+# =============================================================================
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd-image-updater
+  namespace: argocd
+  annotations:
+    # Wave 7: after external-secrets infrastructure
+    argocd.argoproj.io/sync-wave: "7"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://argoproj.github.io/argo-helm
+    chart: argocd-image-updater
+    targetRevision: "1.0.1"
+    helm:
+      values: |
+        config:
+          # Docker Hub registry configuration
+          registries:
+            - name: Docker Hub
+              api_url: https://registry-1.docker.io
+              prefix: docker.io
+              ping: yes
+              defaultns: library
+              default: true
+          # Log level
+          log.level: info
+        # Metrics for monitoring (Phase 7)
+        metrics:
+          enabled: true
+  destination:
+    server: {{ .Values.spec.destination.server }}
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

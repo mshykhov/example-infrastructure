@@ -19,3 +19,11 @@ deploy:
   repoURL: git@github.com:mshykhov/example-deploy.git
   # CHANGE: Branch name
   targetRevision: master
+
+# =============================================================================
+# DOCKER HUB - for Image Updater
+# =============================================================================
+dockerhub:
+  # CHANGE: Your Docker Hub username
+  username: shykhovmyron
+
