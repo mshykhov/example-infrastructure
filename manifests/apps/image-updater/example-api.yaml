@@ -19,7 +19,6 @@ spec:
     method: "git:secret:argocd/repo-example-deploy"
     gitConfig:
       branch: master
-      writeBackTarget: "helmvalues"
   applicationRefs:
     # DEV: includes pre-release versions (0.1.0-rc.1, 0.1.0-beta.2)
     - namePattern: "example-api-dev"
