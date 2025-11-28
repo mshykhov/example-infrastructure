@@ -25,6 +25,7 @@ spec:
             updateStrategy: "semver"
           manifestTargets:
             helm:
+              name: "image.repository"
               tag: "image.tag"
     # PRD: stable versions only (0.1.0, 0.2.0)
     - namePattern: "example-api-prd"
@@ -35,4 +36,5 @@ spec:
             updateStrategy: "semver"
           manifestTargets:
             helm:
+              name: "image.repository"
               tag: "image.tag"
