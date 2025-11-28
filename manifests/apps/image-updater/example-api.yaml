@@ -16,7 +16,7 @@ metadata:
 spec:
   namespace: argocd
   writeBackConfig:
-    method: "git:secret:argocd/git-creds"
+    method: "git:secret:argocd/repo-example-deploy"
     gitConfig:
       branch: master
       writeBackTarget: "helmvalues"
