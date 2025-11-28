@@ -34,6 +34,7 @@ spec:
               ping: yes
               defaultns: library
               default: true
+              credentials: pullsecret:argocd/dockerhub-credentials
           # Log level
           log.level: info
         # Metrics for monitoring (Phase 7)
