@@ -1,0 +1,76 @@
+# =============================================================================
+# APPLICATIONSET - ALL SERVICES × ALL ENVIRONMENTS
+# =============================================================================
+# Docs: https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/Generators-Matrix/
+# Image Updater: https://argocd-image-updater.readthedocs.io/
+#
+# Matrix Generator creates: services/* × environments (dev, prd)
+# Result: example-api-dev, example-api-prd, etc.
+#
+# Workflow:
+#   v0.1.0-rc.1 -> builds -> DEV auto-deploy (constraint ~0-0 includes pre-release)
+#   v0.1.0      -> builds -> PRD auto-deploy (constraint ~0 stable only)
+# =============================================================================
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: services
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "100"
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+    - matrix:
+        generators:
+          # Environments
+          - list:
+              elements:
+                - env: dev
+                  # ~0-0: includes pre-release versions (0.1.0-rc.1, 0.1.0-beta.2)
+                  imageConstraint: "~0-0"
+                - env: prd
+                  # ~0: stable versions only (0.1.0, 0.2.0)
+                  imageConstraint: "~0"
+          # Services from deployment repository
+          - git:
+              repoURL: {{ .Values.deploy.repoURL }}
+              revision: {{ .Values.deploy.targetRevision }}
+              directories:
+                - path: services/*
+                - path: services/_*
+                  exclude: true
+  template:
+    metadata:
+      name: '{{`{{ .path.basename }}`}}-{{`{{ .env }}`}}'
+      labels:
+        app: '{{`{{ .path.basename }}`}}'
+        env: '{{`{{ .env }}`}}'
+    spec:
+      project: default
+      source:
+        repoURL: {{ .Values.deploy.repoURL }}
+        targetRevision: {{ .Values.deploy.targetRevision }}
+        path: '{{`{{ .path.path }}`}}'
+        helm:
+          valueFiles:
+            - values.yaml
+            - 'values-{{`{{ .env }}`}}.yaml'
+          valuesObject:
+            imagePullSecrets:
+              - name: dockerhub-credentials
+      destination:
+        server: {{ .Values.spec.destination.server }}
+        namespace: '{{`{{ .path.basename }}`}}-{{`{{ .env }}`}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        managedNamespaceMetadata:
+          labels:
+            app: '{{`{{ .path.basename }}`}}'
+            env: '{{`{{ .env }}`}}'
+            dockerhub-pull: "true"
+        syncOptions:
+          - CreateNamespace=true

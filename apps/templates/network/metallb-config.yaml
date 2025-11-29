@@ -1,32 +1,29 @@
 # =============================================================================
-# DOCKER CREDENTIALS - CLUSTER EXTERNAL SECRET
+# METALLB CONFIGURATION (IPAddressPool + L2Advertisement)
 # =============================================================================
-# Docs: https://external-secrets.io/latest/api/clusterexternalsecret/
+# Docs: https://metallb.io/configuration/
 #
-# Deploys ClusterExternalSecret that creates dockerhub-credentials
-# in all namespaces with label: dockerhub-pull: "true"
+# Applied after MetalLB CRDs are ready.
+# Actual config is in: manifests/network/metallb-config/config.yaml
 # =============================================================================
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: docker-credentials
+  name: metallb-config
   namespace: argocd
   annotations:
-    # Wave 6: after secret-stores (wave 5)
-    argocd.argoproj.io/sync-wave: "6"
+    argocd.argoproj.io/sync-wave: "2"
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   source:
-    # Uses values from apps/values.yaml
     repoURL: {{ .Values.spec.source.repoURL }}
     targetRevision: {{ .Values.spec.source.targetRevision }}
-    # Keep as-is: path to docker credentials manifests
-    path: manifests/infra/docker-credentials
+    path: manifests/network/metallb-config
   destination:
     server: {{ .Values.spec.destination.server }}
-    namespace: external-secrets
+    namespace: metallb-system
   syncPolicy:
     automated:
       prune: true

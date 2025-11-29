@@ -1,0 +1,30 @@
+# =============================================================================
+# IMAGE UPDATER CONFIG - ImageUpdater CRs
+# =============================================================================
+# Docs: https://argocd-image-updater.readthedocs.io/en/stable/configuration/migration/
+#
+# Deploys ImageUpdater CRs that define which applications to monitor
+# and how to update their images.
+# =============================================================================
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: image-updater-config
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "8"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: {{ .Values.spec.source.repoURL }}
+    targetRevision: {{ .Values.spec.source.targetRevision }}
+    path: manifests/apps/image-updater
+  destination:
+    server: {{ .Values.spec.destination.server }}
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

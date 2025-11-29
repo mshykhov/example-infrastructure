@@ -1,0 +1,35 @@
+# =============================================================================
+# METALLB - LOADBALANCER FOR BARE-METAL KUBERNETES
+# =============================================================================
+# Docs: https://metallb.io/
+#
+# Provides LoadBalancer service type for bare-metal clusters.
+# No changes needed - uses official Helm chart.
+# =============================================================================
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: metallb
+  namespace: argocd
+  annotations:
+    # Wave 1: networking
+    argocd.argoproj.io/sync-wave: "1"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    # Official Helm chart - no changes needed
+    repoURL: https://metallb.github.io/metallb
+    chart: metallb
+    # OPTIONAL: Update version as needed
+    targetRevision: "0.15.2"
+  destination:
+    server: {{ .Values.spec.destination.server }}
+    namespace: metallb-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
