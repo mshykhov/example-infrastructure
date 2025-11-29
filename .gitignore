@@ -52,8 +52,6 @@ coverage/
 *.swp
 *~
 
-# Secrets - NEVER commit!
-*-secret.yaml
 # *-secrets.yaml исключено - конфликтует с external-secrets.yaml
 *.key
 *.pem
