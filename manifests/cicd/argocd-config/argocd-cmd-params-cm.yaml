@@ -16,6 +16,12 @@ metadata:
     app.kubernetes.io/part-of: argocd
 data:
   # ---------------------------------------------------------------------------
+  # SERVER SETTINGS
+  # ---------------------------------------------------------------------------
+  # Run server without TLS (Tailscale/Traefik handles TLS termination)
+  server.insecure: "true"
+
+  # ---------------------------------------------------------------------------
   # REPO SERVER SETTINGS
   # ---------------------------------------------------------------------------
   # Timeout for repo server calls from controller (default 60)
