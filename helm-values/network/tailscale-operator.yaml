@@ -1,0 +1,18 @@
+operatorConfig:
+  defaultTags:
+    - "tag:k8s-operator"
+  hostname: "tailscale-operator"
+  logging: "info"
+
+proxyConfig:
+  defaultTags: "tag:k8s"
+
+apiServerProxyConfig:
+  mode: "true"
+  allowImpersonation: "true"
+
+oauth: {}
+
+oauthSecretVolume:
+  secret:
+    secretName: tailscale-oauth

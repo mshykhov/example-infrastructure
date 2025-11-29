@@ -1,0 +1,43 @@
+# =============================================================================
+# TAILSCALE KUBERNETES OPERATOR
+# =============================================================================
+# Docs: https://tailscale.com/kb/1236/kubernetes-operator
+#
+# Provides:
+# - Ingress to tailnet (ArgoCD, Longhorn access via Tailscale)
+# - API Server Proxy (kubectl via Tailscale)
+# - Egress from cluster to tailnet
+#
+# Prerequisites:
+# - Tailscale ACL configured with tag:k8s-operator and tag:k8s
+# - OAuth client created with Devices, Auth Keys, Services scopes
+# - Doppler secrets: TS_OAUTH_CLIENT_ID, TS_OAUTH_CLIENT_SECRET
+# =============================================================================
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: tailscale-operator
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  sources:
+    - repoURL: https://pkgs.tailscale.com/helmcharts
+      chart: tailscale-operator
+      targetRevision: "1.90.9"
+      helm:
+        valueFiles:
+          - $values/helm-values/network/tailscale-operator.yaml
+    - repoURL: {{ .Values.spec.source.repoURL }}
+      targetRevision: {{ .Values.spec.source.targetRevision }}
+      ref: values
+  destination:
+    server: {{ .Values.spec.destination.server }}
+    namespace: tailscale
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
