@@ -39,14 +39,14 @@ spec:
         dockerhub-pull: "true"
 
   # How often to check for new matching namespaces
-  refreshTime: "1m"
+  refreshTime: 5m
 
   externalSecretSpec:
     secretStoreRef:
       name: doppler-shared
       kind: ClusterSecretStore
 
-    refreshInterval: "1m"
+    refreshInterval: 5m
 
     target:
       name: dockerhub-credentials
