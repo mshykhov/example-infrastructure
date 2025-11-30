@@ -43,5 +43,4 @@ services:
     namespace: argocd
     backend:
       name: argocd-server
-      port: 443
-      protocol: HTTPS
+      port: 80
