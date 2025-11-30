@@ -18,8 +18,8 @@ extraArgs:
   pass-access-token: "true"
   cookie-secure: "true"
   cookie-samesite: "lax"
-  whitelist-domain: ".ts.net"
-  cookie-domain: ".ts.net"
+  whitelist-domain: ".tail876052.ts.net"
+  cookie-domain: ".tail876052.ts.net"
 
 extraEnv:
   - name: OAUTH2_PROXY_OIDC_ISSUER_URL
