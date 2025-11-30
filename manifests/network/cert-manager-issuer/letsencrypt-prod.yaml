@@ -1,0 +1,45 @@
+# =============================================================================
+# LETSENCRYPT CLUSTER ISSUER
+# =============================================================================
+# Docs: https://cert-manager.io/docs/configuration/acme/
+#
+# Issues production certificates from Let's Encrypt.
+# Uses HTTP-01 challenge via Traefik ingress.
+#
+# Usage in IngressRoute:
+#   tls:
+#     secretName: my-app-tls
+#   + Certificate resource with this issuer
+# =============================================================================
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    # Production server
+    server: https://acme-v02.api.letsencrypt.org/directory
+    # CHANGE: Your email for certificate expiry notifications
+    email: admin@example.com
+    privateKeySecretRef:
+      name: letsencrypt-prod-account-key
+    solvers:
+      - http01:
+          ingress:
+            ingressClassName: traefik
+---
+# Staging issuer for testing (won't hit rate limits)
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-staging
+spec:
+  acme:
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    email: admin@example.com
+    privateKeySecretRef:
+      name: letsencrypt-staging-account-key
+    solvers:
+      - http01:
+          ingress:
+            ingressClassName: traefik

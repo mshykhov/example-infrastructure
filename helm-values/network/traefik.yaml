@@ -4,20 +4,23 @@
 # Docs: https://github.com/traefik/traefik-helm-chart
 #
 # Architecture:
-# - Internal Service: Tailscale LoadBalancer (traefik.tail876052.ts.net)
-#   - TLS terminated by Tailscale proxy (auto Let's Encrypt)
-#   - ForwardAuth middleware → oauth2-proxy → Auth0 (Phase 6)
-#   - Routes: longhorn, prometheus, alertmanager
-#
-# - Public Service: MetalLB LoadBalancer (future)
+# - Primary Service: MetalLB LoadBalancer (public)
+#   - IP: 192.168.8.240 (from MetalLB pool)
 #   - TLS via cert-manager + Let's Encrypt
-#   - Routes: api.example.com
+#   - Routes: api.example.com → example-api
+#
+# - Additional Service: Tailscale LoadBalancer (internal)
+#   - TLS terminated by Tailscale proxy
+#   - Routes: longhorn, prometheus, alertmanager (Phase 6+)
+#
+# Prerequisites for public access:
+# 1. Domain with DNS A record → your public IP
+# 2. Router port forwarding: 80,443 → 192.168.8.240
 # =============================================================================
 
-# IngressClass - don't set as default (tailscale is default for now)
 ingressClass:
   enabled: true
-  isDefaultClass: false
+  isDefaultClass: true
 
 # Providers
 providers:
@@ -26,37 +29,49 @@ providers:
     allowCrossNamespace: true
     allowExternalNameServices: true
   kubernetesIngress:
-    enabled: false
+    enabled: true
+    publishedService:
+      enabled: true
 
 # Entrypoints
-# Tailscale proxy terminates TLS, Traefik receives HTTP
 ports:
   web:
     port: 8000
     expose:
       default: true
+      internal: true
     exposedPort: 80
     protocol: TCP
+    redirectTo:
+      port: websecure
+      priority: 10
   websecure:
     port: 8443
     expose:
       default: true
+      internal: true
     exposedPort: 443
     protocol: TCP
     tls:
-      enabled: false
+      enabled: true
 
-# Service configuration
-# Tailscale LoadBalancer for internal access
-# Creates tailnet node: traefik.tail876052.ts.net
+# Primary Service: MetalLB (public access)
 service:
   enabled: true
   type: LoadBalancer
-  annotations:
-    tailscale.com/hostname: "traefik"
+  annotations: {}
   labels: {}
-  spec:
-    loadBalancerClass: tailscale
+  spec: {}
+  # Additional Service: Tailscale (internal access)
+  additionalServices:
+    internal:
+      type: LoadBalancer
+      annotations:
+        tailscale.com/hostname: "traefik"
+      labels:
+        traefik-service-label: internal
+      spec:
+        loadBalancerClass: tailscale
 
 # Logs
 logs:
