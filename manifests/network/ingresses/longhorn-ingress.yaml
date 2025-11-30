@@ -1,3 +1,10 @@
+# =============================================================================
+# LONGHORN INGRESS - Protected by oauth2-proxy
+# =============================================================================
+# CHANGE THIS: Replace "tail876052" with your actual tailnet name
+# Find it: Tailscale Admin Console -> Settings -> General -> Tailnet name
+# Or: kubectl get svc -n tailscale
+# =============================================================================
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -10,6 +17,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
+    # CHANGE THIS: your-tailnet-name.ts.net
     - host: longhorn.tail876052.ts.net
       http:
         paths:
