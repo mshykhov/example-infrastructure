@@ -20,8 +20,6 @@ data:
   # ---------------------------------------------------------------------------
   # Run server without TLS (Tailscale handles TLS termination)
   server.insecure: "true"
-  # Disable built-in auth (using external oauth2-proxy + Auth0)
-  server.disable.auth: "true"
 
   # ---------------------------------------------------------------------------
   # REPO SERVER SETTINGS
