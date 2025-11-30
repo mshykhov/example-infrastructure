@@ -17,7 +17,9 @@ extraArgs:
   set-authorization-header: "true"
   pass-access-token: "true"
   cookie-secure: "true"
-  cookie-samesite: "lax"
+  cookie-samesite: "none"
+  cookie-csrf-per-request: "true"
+  cookie-csrf-expire: "5m"
   whitelist-domain: ".tail876052.ts.net"
   cookie-domain: ".tail876052.ts.net"
 
