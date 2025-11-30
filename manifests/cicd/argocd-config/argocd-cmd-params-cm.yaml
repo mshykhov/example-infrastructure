@@ -24,13 +24,6 @@ data:
   # ---------------------------------------------------------------------------
   # REPO SERVER SETTINGS
   # ---------------------------------------------------------------------------
-  # Timeout for repo server calls from controller (default 60)
-  # Increase if you see "context deadline exceeded" errors
-  controller.repo.server.timeout.seconds: "180"
-
-  # Timeout for repo server calls from server (default 60)
-  server.repo.server.timeout.seconds: "180"
-
-  # Limit on number of concurrent manifest generations (default 1)
-  # Increase if repo-server has enough resources
+  controller.repo.server.timeout.seconds: "300"
+  server.repo.server.timeout.seconds: "300"
   reposerver.parallelism.limit: "2"
