@@ -22,6 +22,7 @@ extraArgs:
   cookie-csrf-expire: "5m"
   whitelist-domain: ".tail876052.ts.net"
   cookie-domain: ".tail876052.ts.net"
+  insecure-oidc-allow-unverified-email: "true"
 
 extraEnv:
   - name: OAUTH2_PROXY_OIDC_ISSUER_URL
