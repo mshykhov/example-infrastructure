@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: argocd-cm
+  name: argocd-rbac-cm
   namespace: argocd
   labels:
-    app.kubernetes.io/name: argocd-cm
+    app.kubernetes.io/name: argocd-rbac-cm
     app.kubernetes.io/part-of: argocd
 data:
-  users.anonymous.enabled: "true"
+  policy.default: "role:admin"
