@@ -18,8 +18,10 @@ data:
   # ---------------------------------------------------------------------------
   # SERVER SETTINGS
   # ---------------------------------------------------------------------------
-  # Run server without TLS (Tailscale/Traefik handles TLS termination)
+  # Run server without TLS (Tailscale handles TLS termination)
   server.insecure: "true"
+  # Disable built-in auth (using external oauth2-proxy + Auth0)
+  server.disable.auth: "true"
 
   # ---------------------------------------------------------------------------
   # REPO SERVER SETTINGS
