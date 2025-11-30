@@ -10,7 +10,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: longhorn.internal.tailnet-xxxx.ts.net
+    - host: longhorn.tail876052.ts.net
       http:
         paths:
           - path: /

@@ -6,7 +6,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: argocd.internal.tailnet-xxxx.ts.net
+    - host: argocd.tail876052.ts.net
       http:
         paths:
           - path: /oauth2
@@ -16,7 +16,7 @@ spec:
                 name: oauth2-proxy
                 port:
                   number: 80
-    - host: longhorn.internal.tailnet-xxxx.ts.net
+    - host: longhorn.tail876052.ts.net
       http:
         paths:
           - path: /oauth2
