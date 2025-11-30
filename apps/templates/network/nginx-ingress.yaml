@@ -1,36 +1,38 @@
 # =============================================================================
-# LONGHORN - DISTRIBUTED BLOCK STORAGE FOR KUBERNETES
+# NGINX INGRESS CONTROLLER
 # =============================================================================
-# Docs: https://longhorn.io/docs/1.10.1/deploy/install/install-with-argocd/
+# Docs: https://kubernetes.github.io/ingress-nginx/
 #
-# Provides persistent volumes with replication.
-# No changes needed - uses official Helm chart.
+# Provides:
+# - Internal routing for services exposed via Tailscale
+# - oauth2-proxy auth annotations support
+#
+# Note: Uses ClusterIP, exposed via Tailscale Service (wave 11)
 # =============================================================================
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: longhorn
+  name: nginx-ingress
   namespace: argocd
   annotations:
-    # Wave 3: storage
-    argocd.argoproj.io/sync-wave: "3"
+    argocd.argoproj.io/sync-wave: "12"
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
-  source:
-    # Official Helm chart - no changes needed
-    repoURL: https://charts.longhorn.io
-    chart: longhorn
-    # OPTIONAL: Update version as needed
-    targetRevision: "1.10.1"
-    helm:
-      values: |
-        preUpgradeChecker:
-          jobEnabled: false
+  sources:
+    - repoURL: https://kubernetes.github.io/ingress-nginx
+      chart: ingress-nginx
+      targetRevision: "4.12.0"
+      helm:
+        valueFiles:
+          - $values/helm-values/network/nginx-ingress.yaml
+    - repoURL: {{ .Values.spec.source.repoURL }}
+      targetRevision: {{ .Values.spec.source.targetRevision }}
+      ref: values
   destination:
     server: {{ .Values.spec.destination.server }}
-    namespace: longhorn-system
+    namespace: ingress-nginx
   syncPolicy:
     automated:
       prune: true
@@ -38,10 +40,8 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
-      - SkipDryRunOnMissingResource=true
     retry:
       limit: 5
-      refresh: true
       backoff:
         duration: 5s
         factor: 2

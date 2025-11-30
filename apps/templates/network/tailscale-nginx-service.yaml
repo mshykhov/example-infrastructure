@@ -1,21 +1,15 @@
 # =============================================================================
-# TAILSCALE INGRESSES - Admin UIs via Tailscale
+# TAILSCALE SERVICE FOR NGINX INGRESS
 # =============================================================================
-# Docs: https://tailscale.com/kb/1439/kubernetes-operator-cluster-ingress
-#
-# Exposes admin UIs to tailnet:
-# - https://argocd (ArgoCD)
-# - https://longhorn (Longhorn)
-#
-# Each Ingress creates a proxy pod that joins tailnet with tag:k8s
+# Exposes NGINX Ingress Controller to tailnet as internal.tailnet-xxxx.ts.net
 # =============================================================================
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: tailscale-ingresses
+  name: tailscale-nginx-service
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "11"
+    argocd.argoproj.io/sync-wave: "13"
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
@@ -23,11 +17,13 @@ spec:
   source:
     repoURL: {{ .Values.spec.source.repoURL }}
     targetRevision: {{ .Values.spec.source.targetRevision }}
-    path: manifests/network/tailscale-ingresses
+    path: manifests/network/tailscale-nginx-service
   destination:
     server: {{ .Values.spec.destination.server }}
-    namespace: tailscale
+    namespace: ingress-nginx
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
+    syncOptions:
+      - ServerSideApply=true

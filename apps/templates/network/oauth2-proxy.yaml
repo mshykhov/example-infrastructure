@@ -1,47 +1,44 @@
 # =============================================================================
-# LONGHORN - DISTRIBUTED BLOCK STORAGE FOR KUBERNETES
+# OAUTH2-PROXY
 # =============================================================================
-# Docs: https://longhorn.io/docs/1.10.1/deploy/install/install-with-argocd/
+# Docs: https://oauth2-proxy.github.io/oauth2-proxy/
+# Chart: https://github.com/oauth2-proxy/manifests
 #
-# Provides persistent volumes with replication.
-# No changes needed - uses official Helm chart.
+# Provides authentication middleware for NGINX Ingress.
+# Uses Auth0 as OIDC provider.
 # =============================================================================
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: longhorn
+  name: oauth2-proxy
   namespace: argocd
   annotations:
-    # Wave 3: storage
-    argocd.argoproj.io/sync-wave: "3"
+    argocd.argoproj.io/sync-wave: "15"
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
-  source:
-    # Official Helm chart - no changes needed
-    repoURL: https://charts.longhorn.io
-    chart: longhorn
-    # OPTIONAL: Update version as needed
-    targetRevision: "1.10.1"
-    helm:
-      values: |
-        preUpgradeChecker:
-          jobEnabled: false
+  sources:
+    - repoURL: https://oauth2-proxy.github.io/manifests
+      chart: oauth2-proxy
+      targetRevision: "7.18.0"
+      helm:
+        valueFiles:
+          - $values/helm-values/network/oauth2-proxy.yaml
+    - repoURL: {{ .Values.spec.source.repoURL }}
+      targetRevision: {{ .Values.spec.source.targetRevision }}
+      ref: values
   destination:
     server: {{ .Values.spec.destination.server }}
-    namespace: longhorn-system
+    namespace: oauth2-proxy
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
-      - CreateNamespace=true
       - ServerSideApply=true
-      - SkipDryRunOnMissingResource=true
     retry:
       limit: 5
-      refresh: true
       backoff:
         duration: 5s
         factor: 2

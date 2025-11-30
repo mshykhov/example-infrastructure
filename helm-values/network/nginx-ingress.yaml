@@ -1,0 +1,42 @@
+# NGINX Ingress Controller
+# Docs: https://kubernetes.github.io/ingress-nginx/
+# Chart: https://github.com/kubernetes/ingress-nginx/tree/main/charts/ingress-nginx
+
+controller:
+  # ClusterIP - Tailscale Service will expose it
+  service:
+    type: ClusterIP
+
+  # Ingress class
+  ingressClassResource:
+    name: nginx
+    enabled: true
+    default: true
+
+  # Enable for oauth2-proxy auth annotations
+  config:
+    use-forwarded-headers: "true"
+    proxy-buffer-size: "8k"
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
+
+  # Security
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 101
+    runAsGroup: 101
+
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+      add:
+        - NET_BIND_SERVICE
+    readOnlyRootFilesystem: false

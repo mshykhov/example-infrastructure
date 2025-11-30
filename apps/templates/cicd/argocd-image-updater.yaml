@@ -47,3 +47,13 @@ spec:
     automated:
       prune: true
       selfHeal: true
+    syncOptions:
+      - ServerSideApply=true
+      - SkipDryRunOnMissingResource=true
+    retry:
+      limit: 5
+      refresh: true
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

@@ -1,0 +1,62 @@
+# oauth2-proxy
+# Docs: https://oauth2-proxy.github.io/oauth2-proxy/
+# Chart: https://github.com/oauth2-proxy/manifests/tree/main/helm/oauth2-proxy
+
+config:
+  existingSecret: oauth2-proxy-secrets
+  configFile: |-
+    email_domains = [ "*" ]
+    upstreams = [ "static://202" ]
+
+extraArgs:
+  provider: "oidc"
+  provider-display-name: "Auth0"
+  reverse-proxy: "true"
+  skip-provider-button: "true"
+  set-xauthrequest: "true"
+  set-authorization-header: "true"
+  pass-access-token: "true"
+  cookie-secure: "true"
+  cookie-samesite: "lax"
+  whitelist-domain: ".ts.net"
+  cookie-domain: ".ts.net"
+
+extraEnv:
+  - name: OAUTH2_PROXY_OIDC_ISSUER_URL
+    valueFrom:
+      secretKeyRef:
+        name: auth0-issuer
+        key: issuer-url
+
+service:
+  type: ClusterIP
+  portNumber: 80
+
+resources:
+  requests:
+    cpu: 10m
+    memory: 32Mi
+  limits:
+    cpu: 100m
+    memory: 64Mi
+
+securityContext:
+  enabled: true
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 2000
+  runAsGroup: 2000
+  seccompProfile:
+    type: RuntimeDefault
+
+replicaCount: 1
+
+redis:
+  enabled: false
+
+sessionStorage:
+  type: cookie
