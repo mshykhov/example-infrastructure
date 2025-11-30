@@ -1,12 +1,13 @@
-# Tailscale Service to expose NGINX Ingress Controller to tailnet
-# Docs: https://tailscale.com/kb/1439/kubernetes-operator-cluster-ingress
+{{- range $name, $service := .Values.services }}
+{{- if $service.enabled }}
+---
 apiVersion: v1
 kind: Service
 metadata:
-  name: nginx-tailscale
+  name: {{ $name }}-tailscale
   namespace: ingress-nginx
   annotations:
-    tailscale.com/hostname: "nginx"
+    tailscale.com/hostname: {{ $name | quote }}
 spec:
   type: LoadBalancer
   loadBalancerClass: tailscale
@@ -22,3 +23,5 @@ spec:
       port: 80
       targetPort: http
       protocol: TCP
+{{- end }}
+{{- end }}

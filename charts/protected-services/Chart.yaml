@@ -1,0 +1,5 @@
+apiVersion: v2
+name: protected-services
+description: Tailscale LoadBalancers and Ingresses for protected services
+type: application
+version: 0.1.0

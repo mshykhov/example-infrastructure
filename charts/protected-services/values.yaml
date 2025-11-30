@@ -1,0 +1,32 @@
+# =============================================================================
+# PROTECTED SERVICES CONFIGURATION
+# =============================================================================
+# CHANGE THIS: Replace "tail876052" with your actual tailnet name
+# Find it: Tailscale Admin Console -> Settings -> General -> Tailnet name
+# =============================================================================
+
+tailnet: tail876052
+
+# oauth2-proxy settings (shared across all ingresses)
+oauth2Proxy:
+  authUrl: "http://oauth2-proxy.oauth2-proxy.svc.cluster.local/oauth2/auth"
+  authSignin: "https://$host/oauth2/start?rd=$escaped_request_uri"
+  authResponseHeaders: "X-Auth-Request-User,X-Auth-Request-Email"
+
+# Services to expose via Tailscale + NGINX Ingress + oauth2-proxy
+services:
+  longhorn:
+    enabled: true
+    namespace: longhorn-system
+    backend:
+      name: longhorn-frontend
+      port: 80
+
+  # Uncomment to enable ArgoCD
+  argocd:
+    enabled: true
+    namespace: argocd
+    backend:
+      name: argocd-server
+      port: 443
+      protocol: HTTPS

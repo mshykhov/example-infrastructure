@@ -1,15 +1,13 @@
 # =============================================================================
-# PROTECTED INGRESSES
+# PROTECTED SERVICES
 # =============================================================================
-# Ingresses for internal services protected by oauth2-proxy.
-#
-# NOTE: Update hosts in manifests/network/ingresses/*.yaml with your
-# actual Tailscale hostname (<service>.<tailnet>.ts.net)
+# Tailscale LoadBalancers + NGINX Ingresses + oauth2-proxy for internal services
+# Configure in: charts/protected-services/values.yaml
 # =============================================================================
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: protected-ingresses
+  name: protected-services
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "17"
@@ -20,7 +18,10 @@ spec:
   source:
     repoURL: {{ .Values.spec.source.repoURL }}
     targetRevision: {{ .Values.spec.source.targetRevision }}
-    path: manifests/network/ingresses
+    path: charts/protected-services
+    helm:
+      valueFiles:
+        - values.yaml
   destination:
     server: {{ .Values.spec.destination.server }}
     namespace: default
