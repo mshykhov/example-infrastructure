@@ -42,9 +42,11 @@ ports:
       internal: true
     exposedPort: 80
     protocol: TCP
-    redirectTo:
-      port: websecure
-      priority: 10
+    redirections:
+      entryPoint:
+        to: websecure
+        scheme: https
+        permanent: true
   websecure:
     port: 8443
     expose:
