@@ -18,7 +18,7 @@ spec:
   ingressClassName: nginx
   rules:
     # CHANGE THIS: your-tailnet-name.ts.net
-    - host: longhorn.tail876052.ts.net
+    - host: longhorn.nginx.tail876052.ts.net
       http:
         paths:
           - path: /

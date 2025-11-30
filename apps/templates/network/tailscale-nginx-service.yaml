@@ -1,7 +1,7 @@
 # =============================================================================
 # TAILSCALE SERVICE FOR NGINX INGRESS
 # =============================================================================
-# Exposes NGINX Ingress Controller to tailnet as internal.tailnet-xxxx.ts.net
+# Exposes NGINX Ingress Controller to tailnet (accessible via <tailnet>.ts.net)
 # =============================================================================
 apiVersion: argoproj.io/v1alpha1
 kind: Application

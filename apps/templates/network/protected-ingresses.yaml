@@ -4,7 +4,7 @@
 # Ingresses for internal services protected by oauth2-proxy.
 #
 # NOTE: Update hosts in manifests/network/ingresses/*.yaml with your
-# actual Tailscale hostname (internal.tailnet-xxxx.ts.net)
+# actual Tailscale hostname (<service>.<tailnet>.ts.net)
 # =============================================================================
 apiVersion: argoproj.io/v1alpha1
 kind: Application

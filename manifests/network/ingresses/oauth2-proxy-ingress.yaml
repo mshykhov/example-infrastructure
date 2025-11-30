@@ -1,3 +1,11 @@
+# =============================================================================
+# OAUTH2-PROXY INGRESS - Handles /oauth2 paths for all protected services
+# =============================================================================
+# CHANGE THIS: Replace "tail876052" with your actual tailnet name
+# Find it: Tailscale Admin Console -> Settings -> General -> Tailnet name
+#
+# Add new host entry here for each protected service you add
+# =============================================================================
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -6,7 +14,9 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    # - host: argocd.tail876052.ts.net
+    # CHANGE THIS: your-tailnet-name.ts.net
+    # Uncomment when ready to protect ArgoCD
+    # - host: argocd.<tailnet>.ts.net
     #   http:
     #     paths:
     #       - path: /oauth2
@@ -16,7 +26,7 @@ spec:
     #             name: oauth2-proxy
     #             port:
     #               number: 80
-    - host: longhorn.tail876052.ts.net
+    - host: longhorn.nginx.tail876052.ts.net
       http:
         paths:
           - path: /oauth2
