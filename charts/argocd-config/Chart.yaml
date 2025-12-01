@@ -1,5 +1,5 @@
 apiVersion: v2
 name: argocd-config
-description: ArgoCD configuration (OIDC, RBAC, etc.)
+description: ArgoCD configuration (anonymous access, ingress via protected-services)
 type: application
-version: 1.0.0
+version: 2.0.0
