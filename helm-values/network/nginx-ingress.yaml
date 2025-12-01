@@ -18,6 +18,7 @@ controller:
     use-forwarded-headers: "true"
     proxy-buffer-size: "8k"
     allow-snippet-annotations: "true"
+    annotations-risk-level: "Critical"
 
   resources:
     requests:
