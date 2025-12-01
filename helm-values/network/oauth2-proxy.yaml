@@ -1,0 +1,167 @@
+# =============================================================================
+# OAUTH2-PROXY - PRODUCTION CONFIGURATION
+# =============================================================================
+# Chart: https://github.com/oauth2-proxy/manifests
+# Docs: https://oauth2-proxy.github.io/oauth2-proxy/
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# OAuth2/OIDC Configuration
+# -----------------------------------------------------------------------------
+config:
+  existingSecret: oauth2-proxy-secrets
+  configFile: |-
+    provider = "oidc"
+    provider_display_name = "Auth0"
+    oidc_issuer_url = "https://dev-tgrsoxiakeqdr1gg.us.auth0.com/"
+    email_domains = ["*"]
+    upstreams = ["static://202"]
+    reverse_proxy = true
+    set_xauthrequest = true
+    set_authorization_header = true
+    pass_access_token = true
+    skip_provider_button = true
+    cookie_secure = true
+    cookie_samesite = "lax"
+    cookie_httponly = true
+    cookie_csrf_per_request = true
+    cookie_csrf_expire = "5m"
+    whitelist_domain = ".tail876052.ts.net"
+    cookie_domain = ".tail876052.ts.net"
+    insecure_oidc_allow_unverified_email = true
+
+extraArgs:
+  silence-ping-logging: "true"
+
+# -----------------------------------------------------------------------------
+# Session Storage - Redis Sentinel (HA)
+# -----------------------------------------------------------------------------
+sessionStorage:
+  type: redis
+  redis:
+    clientType: sentinel
+    existingSecret: oauth2-proxy-redis
+    passwordKey: redis-password
+    sentinel:
+      existingSecret: oauth2-proxy-redis
+      passwordKey: redis-password
+      masterName: mymaster
+      connectionUrls:
+        - "redis://oauth2-proxy-redis-announce-0:26379"
+        - "redis://oauth2-proxy-redis-announce-1:26379"
+        - "redis://oauth2-proxy-redis-announce-2:26379"
+
+# -----------------------------------------------------------------------------
+# Redis HA Subchart
+# -----------------------------------------------------------------------------
+redis:
+  enabled: true
+  fullnameOverride: oauth2-proxy-redis
+
+  existingSecret: oauth2-proxy-redis
+  authKey: redis-password
+
+  replicas: 3
+
+  redis:
+    masterGroupName: mymaster
+    config:
+      min-replicas-to-write: 1
+      min-replicas-max-lag: 5
+      maxmemory: 64mb
+      maxmemory-policy: volatile-lru
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 200m
+        memory: 128Mi
+
+  sentinel:
+    resources:
+      requests:
+        cpu: 25m
+        memory: 32Mi
+      limits:
+        cpu: 100m
+        memory: 64Mi
+
+  hardAntiAffinity: false
+
+  persistentVolume:
+    enabled: true
+    size: 1Gi
+    storageClass: longhorn
+
+  haproxy:
+    enabled: false
+
+  exporter:
+    enabled: false
+
+initContainers:
+  waitForRedis:
+    enabled: true
+    timeout: 300
+
+# -----------------------------------------------------------------------------
+# Deployment Configuration
+# -----------------------------------------------------------------------------
+replicaCount: 2
+
+resources:
+  requests:
+    cpu: 25m
+    memory: 32Mi
+  limits:
+    cpu: 100m
+    memory: 64Mi
+
+securityContext:
+  enabled: true
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 2000
+  runAsGroup: 2000
+  seccompProfile:
+    type: RuntimeDefault
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+# -----------------------------------------------------------------------------
+# Service Configuration
+# -----------------------------------------------------------------------------
+service:
+  type: ClusterIP
+  portNumber: 80
+
+# -----------------------------------------------------------------------------
+# Probes
+# -----------------------------------------------------------------------------
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 10
+  timeoutSeconds: 3
+
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 5
+  timeoutSeconds: 3
+  periodSeconds: 5
+  successThreshold: 1
+
+# -----------------------------------------------------------------------------
+# Metrics (for future Prometheus integration)
+# -----------------------------------------------------------------------------
+metrics:
+  enabled: true
+  port: 44180
+  serviceMonitor:
+    enabled: false
