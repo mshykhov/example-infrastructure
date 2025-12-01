@@ -18,13 +18,9 @@ services:
   longhorn:
     enabled: true
     namespace: longhorn-system
+    allowedGroups:
+      - infra-admins
+      - longhorn-admins
     backend:
       name: longhorn-frontend
-      port: 80
-
-  argocd:
-    enabled: true
-    namespace: argocd
-    backend:
-      name: argocd-server
       port: 80

@@ -7,7 +7,11 @@ metadata:
   name: {{ $name }}
   namespace: {{ $service.namespace }}
   annotations:
-    nginx.ingress.kubernetes.io/auth-url: {{ $.Values.oauth2Proxy.authUrl | quote }}
+    {{- $authUrl := $.Values.oauth2Proxy.authUrl }}
+    {{- if $service.allowedGroups }}
+    {{- $authUrl = printf "%s?allowed_groups=%s" $.Values.oauth2Proxy.authUrl (join "," $service.allowedGroups) }}
+    {{- end }}
+    nginx.ingress.kubernetes.io/auth-url: {{ $authUrl | quote }}
     nginx.ingress.kubernetes.io/auth-signin: {{ $.Values.oauth2Proxy.authSignin | quote }}
     nginx.ingress.kubernetes.io/auth-response-headers: {{ $.Values.oauth2Proxy.authResponseHeaders | quote }}
     {{- if $service.backend.protocol }}

@@ -30,6 +30,7 @@ spec:
               set_xauthrequest = true
               set_authorization_header = true
               pass_access_token = true
+              pass_user_headers = true
               skip_provider_button = true
               cookie_secure = true
               cookie_samesite = "lax"
@@ -39,6 +40,7 @@ spec:
               whitelist_domains = [".{{ .Values.global.tailnet }}.ts.net", ".auth0.com"]
               cookie_domains = [".{{ .Values.global.tailnet }}.ts.net"]
               insecure_oidc_allow_unverified_email = true
+              oidc_groups_claim = "groups"
     # Values from git repo
     - repoURL: {{ .Values.spec.source.repoURL }}
       targetRevision: {{ .Values.spec.source.targetRevision }}

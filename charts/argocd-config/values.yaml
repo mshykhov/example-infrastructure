@@ -1,0 +1,4 @@
+argocd:
+  adminGroups:
+    - infra-admins
+    - argocd-admins

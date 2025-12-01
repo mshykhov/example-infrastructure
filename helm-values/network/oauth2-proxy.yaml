@@ -8,9 +8,24 @@
 # -----------------------------------------------------------------------------
 # OAuth2/OIDC Configuration
 # NOTE: configFile is set via valuesObject in Application template (dynamic)
+# Secrets from: auth0-oidc-credentials (shared) + oauth2-proxy-cookie (specific)
 # -----------------------------------------------------------------------------
-config:
-  existingSecret: oauth2-proxy-secrets
+extraEnv:
+  - name: OAUTH2_PROXY_CLIENT_ID
+    valueFrom:
+      secretKeyRef:
+        name: auth0-oidc-credentials
+        key: client-id
+  - name: OAUTH2_PROXY_CLIENT_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: auth0-oidc-credentials
+        key: client-secret
+  - name: OAUTH2_PROXY_COOKIE_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: oauth2-proxy-cookie
+        key: cookie-secret
 
 extraArgs:
   silence-ping-logging: "true"

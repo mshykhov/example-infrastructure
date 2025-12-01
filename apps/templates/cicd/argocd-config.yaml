@@ -1,10 +1,10 @@
 # =============================================================================
 # ARGOCD CONFIGURATION
 # =============================================================================
-# Docs: https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/
-#
-# Manages ArgoCD configuration via GitOps (argocd-cmd-params-cm).
-# Fixes "context deadline exceeded" errors by increasing timeouts.
+# Manages ArgoCD configuration via GitOps:
+# - OIDC with Auth0 (native login/logout)
+# - RBAC (admin access for specific users/groups)
+# - Server params (timeouts, insecure mode)
 # =============================================================================
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -20,7 +20,14 @@ spec:
   source:
     repoURL: {{ .Values.spec.source.repoURL }}
     targetRevision: {{ .Values.spec.source.targetRevision }}
-    path: manifests/cicd/argocd-config
+    path: charts/argocd-config
+    helm:
+      valuesObject:
+        global:
+          tailnet: {{ .Values.global.tailnet }}
+          auth0:
+            domain: {{ .Values.global.auth0.domain }}
+            clientId: {{ .Values.global.auth0.clientId }}
   destination:
     server: {{ .Values.spec.destination.server }}
     namespace: argocd

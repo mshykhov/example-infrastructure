@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: argocd
+  labels:
+    dockerhub-pull: "true"
+    auth0-oidc: "true"
