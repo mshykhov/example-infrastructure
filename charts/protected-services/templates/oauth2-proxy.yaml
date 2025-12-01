@@ -3,6 +3,8 @@ kind: Deployment
 metadata:
   name: oauth2-proxy
   namespace: oauth2-proxy
+  annotations:
+    reloader.stakater.com/auto: "true"
 spec:
   replicas: {{ .Values.oauth2Proxy.replicas }}
   selector:

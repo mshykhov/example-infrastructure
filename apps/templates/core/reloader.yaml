@@ -1,0 +1,32 @@
+# =============================================================================
+# STAKATER RELOADER - AUTO RESTART PODS ON SECRET/CONFIGMAP CHANGES
+# =============================================================================
+# Docs: https://github.com/stakater/Reloader
+#
+# Watches Secrets/ConfigMaps and automatically triggers rollouts when they change.
+# Add annotation to deployments: reloader.stakater.com/auto: "true"
+# =============================================================================
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: reloader
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "5"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://stakater.github.io/stakater-charts
+    chart: reloader
+    targetRevision: "1.4.2"
+  destination:
+    server: {{ .Values.spec.destination.server }}
+    namespace: reloader
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
