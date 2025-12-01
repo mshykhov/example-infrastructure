@@ -15,6 +15,16 @@ oauth2Proxy:
 # Services to protect via Tailscale + NGINX Ingress + OAuth2-Proxy
 # =============================================================================
 services:
+  argocd:
+    enabled: true
+    namespace: argocd
+    allowedGroups:
+      - infra-admins
+      - argocd-admins
+    backend:
+      name: argocd-server
+      port: 80
+
   longhorn:
     enabled: true
     namespace: longhorn-system

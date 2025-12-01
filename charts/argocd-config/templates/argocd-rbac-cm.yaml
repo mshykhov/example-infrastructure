@@ -7,12 +7,5 @@ metadata:
     app.kubernetes.io/name: argocd-rbac-cm
     app.kubernetes.io/part-of: argocd
 data:
-  policy.default: role:readonly
-  policy.csv: |
-    p, role:readonly, applications, get, */*, allow
-    p, role:readonly, projects, get, *, allow
-    p, role:admin, *, *, *, allow
-    {{- range .Values.argocd.adminGroups }}
-    g, {{ . }}, role:admin
-    {{- end }}
-  scopes: '[groups, email]'
+  # Anonymous users get admin role (access controlled by oauth2-proxy)
+  policy.default: role:admin

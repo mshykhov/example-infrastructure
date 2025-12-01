@@ -1,4 +1,2 @@
-argocd:
-  adminGroups:
-    - infra-admins
-    - argocd-admins
+# ArgoCD config values (RBAC handled by oauth2-proxy)
+argocd: {}
