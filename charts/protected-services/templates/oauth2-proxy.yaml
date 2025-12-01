@@ -38,6 +38,7 @@ spec:
             - --cookie-csrf-per-request=true
             - --cookie-csrf-expire=5m
             - --whitelist-domain=.{{ .Values.tailnet }}.ts.net
+            - --whitelist-domain=.auth0.com
             - --cookie-domain=.{{ .Values.tailnet }}.ts.net
             - --insecure-oidc-allow-unverified-email=true
             - --email-domain=*
@@ -64,10 +65,10 @@ spec:
                 secretKeyRef:
                   name: auth0-issuer
                   key: issuer-url
-            - name: OAUTH2_PROXY_LOGOUT_REDIRECT_URL
+            - name: OAUTH2_PROXY_BACKEND_LOGOUT_URL
               valueFrom:
                 secretKeyRef:
-                  name: auth0-issuer
+                  name: auth0-logout
                   key: logout-url
           ports:
             - containerPort: 4180
