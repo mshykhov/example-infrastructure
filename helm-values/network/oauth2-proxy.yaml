@@ -16,6 +16,9 @@ podAnnotations:
 # NOTE: configFile is set via valuesObject in Application template (dynamic)
 # Secrets from: auth0-oidc-credentials (shared) + oauth2-proxy-cookie (specific)
 # -----------------------------------------------------------------------------
+# Disable default secret-based env vars (we use extraEnv with custom secrets)
+proxyVarsAsSecrets: false
+
 extraEnv:
   - name: OAUTH2_PROXY_CLIENT_ID
     valueFrom:
