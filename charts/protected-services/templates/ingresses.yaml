@@ -15,12 +15,12 @@ metadata:
     {{- end }}
     nginx.ingress.kubernetes.io/server-snippet: |
       location = /logout {
-        return 302 /oauth2/sign_out?rd=https%3A%2F%2F{{ $.Values.oauth2Proxy.auth0Domain }}%2Fv2%2Flogout%3Fclient_id%3D{{ $.Values.oauth2Proxy.auth0ClientId }}%26returnTo%3Dhttps%253A%252F%252F$host;
+        return 302 /oauth2/sign_out?rd=https%3A%2F%2F{{ $.Values.global.auth0.domain }}%2Fv2%2Flogout%3Fclient_id%3D{{ $.Values.global.auth0.clientId }}%26returnTo%3Dhttps%253A%252F%252F$host;
       }
 spec:
   ingressClassName: nginx
   rules:
-    - host: {{ $name }}.{{ $.Values.tailnet }}.ts.net
+    - host: {{ $name }}.{{ $.Values.global.tailnet }}.ts.net
       http:
         paths:
           - path: /

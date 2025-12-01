@@ -24,7 +24,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: {{ $name }}.{{ $.Values.tailnet }}.ts.net
+    - host: {{ $name }}.{{ $.Values.global.tailnet }}.ts.net
       http:
         paths:
           - path: /oauth2

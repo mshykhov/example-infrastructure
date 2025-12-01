@@ -7,28 +7,10 @@
 
 # -----------------------------------------------------------------------------
 # OAuth2/OIDC Configuration
+# NOTE: configFile is set via valuesObject in Application template (dynamic)
 # -----------------------------------------------------------------------------
 config:
   existingSecret: oauth2-proxy-secrets
-  configFile: |-
-    provider = "oidc"
-    provider_display_name = "Auth0"
-    oidc_issuer_url = "https://dev-tgrsoxiakeqdr1gg.us.auth0.com/"
-    email_domains = ["*"]
-    upstreams = ["static://202"]
-    reverse_proxy = true
-    set_xauthrequest = true
-    set_authorization_header = true
-    pass_access_token = true
-    skip_provider_button = true
-    cookie_secure = true
-    cookie_samesite = "lax"
-    cookie_httponly = true
-    cookie_csrf_per_request = true
-    cookie_csrf_expire = "5m"
-    whitelist_domains = [".tail876052.ts.net", ".auth0.com"]
-    cookie_domains = [".tail876052.ts.net"]
-    insecure_oidc_allow_unverified_email = true
 
 extraArgs:
   silence-ping-logging: "true"

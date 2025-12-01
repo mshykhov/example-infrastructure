@@ -10,12 +10,36 @@ metadata:
 spec:
   project: default
   sources:
+    # Helm chart
     - repoURL: https://oauth2-proxy.github.io/manifests
       chart: oauth2-proxy
       targetRevision: "9.0.0"
       helm:
         valueFiles:
           - $values/helm-values/network/oauth2-proxy.yaml
+        # Dynamic values (uses global from apps/values.yaml)
+        valuesObject:
+          config:
+            configFile: |
+              provider = "oidc"
+              provider_display_name = "Auth0"
+              oidc_issuer_url = "https://{{ .Values.global.auth0.domain }}/"
+              email_domains = ["*"]
+              upstreams = ["static://202"]
+              reverse_proxy = true
+              set_xauthrequest = true
+              set_authorization_header = true
+              pass_access_token = true
+              skip_provider_button = true
+              cookie_secure = true
+              cookie_samesite = "lax"
+              cookie_httponly = true
+              cookie_csrf_per_request = true
+              cookie_csrf_expire = "5m"
+              whitelist_domains = [".{{ .Values.global.tailnet }}.ts.net", ".auth0.com"]
+              cookie_domains = [".{{ .Values.global.tailnet }}.ts.net"]
+              insecure_oidc_allow_unverified_email = true
+    # Values from git repo
     - repoURL: {{ .Values.spec.source.repoURL }}
       targetRevision: {{ .Values.spec.source.targetRevision }}
       ref: values
