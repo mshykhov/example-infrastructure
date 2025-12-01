@@ -19,6 +19,10 @@ oauth2Proxy:
   authSignin: "https://$host/oauth2/start?rd=$escaped_request_uri"
   authResponseHeaders: "X-Auth-Request-User,X-Auth-Request-Email,X-Auth-Request-Groups"
 
+  # Auth0 logout configuration (public values, not secrets)
+  auth0Domain: "dev-tgrsoxiakeqdr1gg.us.auth0.com"
+  auth0ClientId: "wsZ3vIm5FlxztPisdo3Jq5BaeJvASZrz"
+
   resources:
     requests:
       cpu: 10m
