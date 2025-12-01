@@ -3,6 +3,8 @@ operatorConfig:
     - "tag:k8s-operator"
   hostname: "tailscale-operator"
   logging: "info"
+  podAnnotations:
+    reloader.stakater.com/auto: "true"
 
 proxyConfig:
   defaultTags: "tag:k8s"

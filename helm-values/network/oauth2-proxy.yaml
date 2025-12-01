@@ -6,6 +6,12 @@
 # =============================================================================
 
 # -----------------------------------------------------------------------------
+# Reloader - auto restart on secret changes
+# -----------------------------------------------------------------------------
+podAnnotations:
+  reloader.stakater.com/auto: "true"
+
+# -----------------------------------------------------------------------------
 # OAuth2/OIDC Configuration
 # NOTE: configFile is set via valuesObject in Application template (dynamic)
 # Secrets from: auth0-oidc-credentials (shared) + oauth2-proxy-cookie (specific)
