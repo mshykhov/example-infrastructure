@@ -1,0 +1,38 @@
+{{- range $name, $service := .Values.services }}
+{{- if $service.enabled }}
+---
+# ExternalName service to reference oauth2-proxy from another namespace
+apiVersion: v1
+kind: Service
+metadata:
+  name: oauth2-proxy
+  namespace: {{ $service.namespace }}
+spec:
+  type: ExternalName
+  externalName: oauth2-proxy.oauth2-proxy.svc.cluster.local
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+---
+# Ingress for oauth2-proxy endpoints on this host
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ $name }}-oauth2
+  namespace: {{ $service.namespace }}
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: {{ $name }}.{{ $.Values.tailnet }}.ts.net
+      http:
+        paths:
+          - path: /oauth2
+            pathType: Prefix
+            backend:
+              service:
+                name: oauth2-proxy
+                port:
+                  number: 80
+{{- end }}
+{{- end }}
