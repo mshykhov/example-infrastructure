@@ -17,6 +17,7 @@ controller:
   config:
     use-forwarded-headers: "true"
     proxy-buffer-size: "8k"
+    allow-snippet-annotations: "true"
 
   resources:
     requests:
