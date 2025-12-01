@@ -26,8 +26,8 @@ config:
     cookie_httponly = true
     cookie_csrf_per_request = true
     cookie_csrf_expire = "5m"
-    whitelist_domain = ".tail876052.ts.net"
-    cookie_domain = ".tail876052.ts.net"
+    whitelist_domains = [".tail876052.ts.net"]
+    cookie_domains = [".tail876052.ts.net"]
     insecure_oidc_allow_unverified_email = true
 
 extraArgs:
