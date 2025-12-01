@@ -16,7 +16,8 @@ controller:
   # Enable for oauth2-proxy auth annotations
   config:
     use-forwarded-headers: "true"
-    proxy-buffer-size: "8k"
+    proxy-buffer-size: "16k"
+    large-client-header-buffers: "4 16k"
     allow-snippet-annotations: "true"
     annotations-risk-level: "Critical"
 
