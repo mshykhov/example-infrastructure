@@ -61,6 +61,9 @@ redis:
   enabled: true
   fullnameOverride: oauth2-proxy-redis
 
+  podAnnotations:
+    reloader.stakater.com/auto: "true"
+
   existingSecret: oauth2-proxy-redis
   authKey: redis-password
 

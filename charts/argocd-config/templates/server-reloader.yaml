@@ -5,4 +5,4 @@ metadata:
   namespace: argocd
   annotations:
     reloader.stakater.com/auto: "true"
-spec: {}
+    reloader.stakater.com/rollout-strategy: "restart"
