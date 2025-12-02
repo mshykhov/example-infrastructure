@@ -38,14 +38,6 @@ spec:
             httpGet:
               path: /ready
               port: 2000
+            failureThreshold: 1
             initialDelaySeconds: 10
             periodSeconds: 10
-          securityContext:
-            readOnlyRootFilesystem: true
-            runAsNonRoot: true
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop: [ALL]
-      securityContext:
-        seccompProfile:
-          type: RuntimeDefault
