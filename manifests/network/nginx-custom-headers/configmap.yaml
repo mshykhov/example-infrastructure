@@ -1,0 +1,11 @@
+# Custom headers for nginx-ingress
+# Docs: https://kubernetes.github.io/ingress-nginx/examples/customization/custom-headers/
+#
+# Fix: X-Forwarded-Port should be 443 for HTTPS traffic from Tailscale
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-custom-headers
+  namespace: ingress-nginx
+data:
+  X-Forwarded-Port: "443"

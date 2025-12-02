@@ -18,6 +18,9 @@ controller:
     use-forwarded-headers: "true"
     allow-snippet-annotations: "true"
     annotations-risk-level: "Critical"
+    # Fix X-Forwarded-Port for HTTPS traffic from Tailscale
+    # Docs: https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/#proxy-set-headers
+    proxy-set-headers: "ingress-nginx/nginx-custom-headers"
 
   resources:
     requests:
