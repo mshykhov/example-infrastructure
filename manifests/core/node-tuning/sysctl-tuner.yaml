@@ -1,0 +1,55 @@
+# =============================================================================
+# SYSCTL TUNER - Node-level kernel parameters
+# =============================================================================
+# Fixes: "too many open files" for Alloy/Promtail log collection
+# Docs: https://grafana.com/docs/alloy/latest/troubleshoot/too-many-open-files/
+# =============================================================================
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: sysctl-tuner
+  namespace: kube-system
+  labels:
+    app: sysctl-tuner
+spec:
+  selector:
+    matchLabels:
+      app: sysctl-tuner
+  template:
+    metadata:
+      labels:
+        app: sysctl-tuner
+    spec:
+      hostPID: true
+      hostNetwork: true
+      initContainers:
+        - name: sysctl-tuner
+          image: busybox:1.36
+          securityContext:
+            privileged: true
+          command:
+            - sh
+            - -c
+            - |
+              echo "Tuning sysctl parameters..."
+              # Increase inotify limits for log collectors (Alloy, Promtail)
+              sysctl -w fs.inotify.max_user_instances=512
+              sysctl -w fs.inotify.max_user_watches=524288
+              # Increase file descriptor limits
+              sysctl -w fs.file-max=2097152
+              echo "Sysctl tuning complete"
+      containers:
+        - name: pause
+          image: gcr.io/google_containers/pause:3.2
+          resources:
+            requests:
+              cpu: 1m
+              memory: 1Mi
+            limits:
+              cpu: 1m
+              memory: 1Mi
+      tolerations:
+        - operator: Exists
+          effect: NoSchedule
+        - operator: Exists
+          effect: NoExecute
