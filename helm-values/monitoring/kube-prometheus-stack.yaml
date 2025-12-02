@@ -13,6 +13,9 @@
 grafana:
   enabled: true
 
+  # Skip password generation - we use anonymous auth behind oauth2-proxy
+  adminPassword: "admin"
+
   # Anonymous access - authentication handled by oauth2-proxy
   # https://grafana.com/docs/grafana/latest/setup-grafana/configure-security/configure-authentication/anonymous-auth
   grafana.ini:
