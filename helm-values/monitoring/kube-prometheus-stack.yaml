@@ -1,0 +1,164 @@
+# =============================================================================
+# KUBE-PROMETHEUS-STACK VALUES
+# =============================================================================
+# Official docs: https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
+# Optimized for k3s single-node (4 CPU, 8GB RAM)
+# Grafana behind oauth2-proxy (anonymous mode)
+# =============================================================================
+
+# =============================================================================
+# GRAFANA
+# =============================================================================
+# Docs: https://grafana.com/docs/grafana/latest/setup-grafana/configure-security/configure-authentication/anonymous-auth
+grafana:
+  enabled: true
+
+  # Anonymous access - authentication handled by oauth2-proxy
+  # https://grafana.com/docs/grafana/latest/setup-grafana/configure-security/configure-authentication/anonymous-auth
+  grafana.ini:
+    auth.anonymous:
+      enabled: true
+      org_name: Main Org.
+      org_role: Admin
+    auth:
+      disable_login_form: true
+    server:
+      root_url: "%(protocol)s://%(domain)s/"
+
+  # No ingress - accessed via protected-services chart
+  ingress:
+    enabled: false
+
+  # Persistence via Longhorn
+  persistence:
+    enabled: true
+    storageClassName: longhorn
+    size: 5Gi
+
+  # Resources for k3s
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+  # Default dashboards
+  defaultDashboardsEnabled: true
+  defaultDashboardsTimezone: utc
+
+  # Additional data sources
+  # https://grafana.com/docs/grafana/latest/datasources/loki/
+  additionalDataSources:
+    - name: Loki
+      type: loki
+      url: http://loki.monitoring.svc.cluster.local:3100
+      access: proxy
+      isDefault: false
+
+# =============================================================================
+# PROMETHEUS
+# =============================================================================
+prometheus:
+  enabled: true
+
+  prometheusSpec:
+    retention: 15d
+    retentionSize: "10GB"
+
+    # Storage via Longhorn
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: longhorn
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 20Gi
+
+    # Resources for k3s
+    resources:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+
+    # Discover all ServiceMonitors/PodMonitors
+    # https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack#prometheusioscrape
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+
+  ingress:
+    enabled: false
+
+# =============================================================================
+# ALERTMANAGER
+# =============================================================================
+alertmanager:
+  enabled: true
+
+  alertmanagerSpec:
+    storage:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: longhorn
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 2Gi
+
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi
+
+  ingress:
+    enabled: false
+
+# =============================================================================
+# NODE EXPORTER
+# =============================================================================
+nodeExporter:
+  enabled: true
+
+prometheus-node-exporter:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 32Mi
+    limits:
+      cpu: 200m
+      memory: 64Mi
+
+# =============================================================================
+# KUBE-STATE-METRICS
+# =============================================================================
+kubeStateMetrics:
+  enabled: true
+
+kube-state-metrics:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+
+# =============================================================================
+# PROMETHEUS OPERATOR
+# =============================================================================
+prometheusOperator:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi

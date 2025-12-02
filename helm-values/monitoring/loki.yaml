@@ -1,0 +1,133 @@
+# =============================================================================
+# LOKI VALUES - SingleBinary Mode
+# =============================================================================
+# Docs: https://grafana.com/docs/loki/latest/setup/install/helm/
+# Optimized for k3s single-node with Longhorn storage
+# =============================================================================
+
+# =============================================================================
+# DEPLOYMENT MODE
+# =============================================================================
+# SingleBinary: All components in one process (best for small deployments)
+# https://grafana.com/docs/loki/latest/get-started/deployment-modes/
+deploymentMode: SingleBinary
+
+# =============================================================================
+# LOKI CONFIGURATION
+# =============================================================================
+loki:
+  auth_enabled: false
+
+  # Common config for all modes
+  commonConfig:
+    replication_factor: 1
+
+  # Storage config - filesystem for single-node
+  storage:
+    type: filesystem
+
+  # Schema configuration
+  # https://grafana.com/docs/loki/latest/configure/#schema_config
+  schemaConfig:
+    configs:
+      - from: "2024-01-01"
+        store: tsdb
+        object_store: filesystem
+        schema: v13
+        index:
+          prefix: loki_index_
+          period: 24h
+
+  # Ingester config for better memory usage
+  ingester:
+    chunk_encoding: snappy
+
+  # Query limits
+  limits_config:
+    retention_period: 168h  # 7 days
+    max_query_series: 5000
+
+# =============================================================================
+# SINGLE BINARY
+# =============================================================================
+singleBinary:
+  replicas: 1
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+  persistence:
+    enabled: true
+    storageClass: longhorn
+    size: 10Gi
+
+# =============================================================================
+# DISABLE SCALABLE COMPONENTS (not needed in SingleBinary mode)
+# =============================================================================
+backend:
+  replicas: 0
+read:
+  replicas: 0
+write:
+  replicas: 0
+
+ingester:
+  replicas: 0
+querier:
+  replicas: 0
+queryFrontend:
+  replicas: 0
+queryScheduler:
+  replicas: 0
+distributor:
+  replicas: 0
+compactor:
+  replicas: 0
+indexGateway:
+  replicas: 0
+bloomCompactor:
+  replicas: 0
+bloomGateway:
+  replicas: 0
+
+# =============================================================================
+# GATEWAY (Nginx) - optional, disable for simplicity
+# =============================================================================
+gateway:
+  enabled: false
+
+# =============================================================================
+# MINIO - disable, using filesystem
+# =============================================================================
+minio:
+  enabled: false
+
+# =============================================================================
+# MONITORING
+# =============================================================================
+monitoring:
+  selfMonitoring:
+    enabled: false
+    grafanaAgent:
+      installOperator: false
+  lokiCanary:
+    enabled: false
+
+# =============================================================================
+# CHUNKSACHE - disable for single-node
+# =============================================================================
+chunksCache:
+  enabled: false
+resultsCache:
+  enabled: false
+
+# =============================================================================
+# TEST - disable
+# =============================================================================
+test:
+  enabled: false
