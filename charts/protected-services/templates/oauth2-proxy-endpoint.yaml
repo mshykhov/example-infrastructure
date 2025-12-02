@@ -1,5 +1,5 @@
 {{- range $name, $service := .Values.services }}
-{{- if $service.enabled }}
+{{- if and $service.enabled (ne $service.oauth2 false) }}
 ---
 # ExternalName service to reference oauth2-proxy from another namespace
 apiVersion: v1

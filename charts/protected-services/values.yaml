@@ -36,22 +36,20 @@ services:
       port: 80
 
   # =============================================================================
-  # DEV Services (Tailscale + OAuth2-Proxy protected)
+  # DEV Services (Tailscale only, oauth2: false disables OAuth2-Proxy)
   # =============================================================================
   example-api-dev:
     enabled: true
+    oauth2: false
     namespace: example-api-dev
-    allowedGroups:
-      - dev
     backend:
-      name: example-api
+      name: example-api-dev
       port: 8080
 
   example-ui-dev:
     enabled: true
+    oauth2: false
     namespace: example-ui-dev
-    allowedGroups:
-      - dev
     backend:
-      name: example-ui
-      port: 80
+      name: example-ui-dev
+      port: 8080

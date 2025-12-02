@@ -6,6 +6,7 @@ kind: Ingress
 metadata:
   name: {{ $name }}
   namespace: {{ $service.namespace }}
+  {{- if ne $service.oauth2 false }}
   annotations:
     {{- $authUrl := $.Values.oauth2Proxy.authUrl }}
     {{- if $service.allowedGroups }}
@@ -21,6 +22,7 @@ metadata:
       location = /logout {
         return 302 /oauth2/sign_out?rd=https%3A%2F%2F{{ $.Values.global.auth0.domain }}%2Fv2%2Flogout%3Fclient_id%3D{{ $.Values.global.auth0.clientId }}%26returnTo%3Dhttps%253A%252F%252F$host;
       }
+  {{- end }}
 spec:
   ingressClassName: nginx
   rules:
