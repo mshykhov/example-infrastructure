@@ -1,8 +1,8 @@
-replicas: 2
+replicas: 1
 
 image:
   repository: cloudflare/cloudflared
-  tag: "2024.11.0"
+  # tag defaults to Chart.appVersion
   pullPolicy: IfNotPresent
 
 resources:
