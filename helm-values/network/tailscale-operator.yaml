@@ -5,6 +5,13 @@ operatorConfig:
   logging: "info"
   podAnnotations:
     reloader.stakater.com/auto: "true"
+  resources:
+    requests:
+      cpu: 10m
+      memory: 32Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
 
 proxyConfig:
   defaultTags: "tag:k8s"
