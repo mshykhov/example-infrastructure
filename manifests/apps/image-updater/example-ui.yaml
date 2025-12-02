@@ -1,0 +1,44 @@
+# =============================================================================
+# IMAGE UPDATER CR - example-ui
+# =============================================================================
+# Docs: https://argocd-image-updater.readthedocs.io/en/stable/configuration/migration/
+#
+# v1.0+ uses CRD instead of annotations on Applications.
+#
+# Workflow:
+#   v0.1.0-rc.1 -> DEV auto-deploy (constraint ~0-0 includes pre-release)
+#   v0.1.0      -> PRD auto-deploy (constraint ~0 stable only)
+# =============================================================================
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: example-ui
+spec:
+  namespace: argocd
+  writeBackConfig:
+    method: "git:secret:argocd/repo-example-deploy"
+    gitConfig:
+      branch: master
+  applicationRefs:
+    # DEV: includes pre-release versions (0.1.0-rc.1, 0.1.0-beta.2)
+    - namePattern: "example-ui-dev"
+      images:
+        - alias: "app"
+          imageName: "shykhovmyron/example-ui:~0-0"
+          commonUpdateSettings:
+            updateStrategy: "semver"
+          manifestTargets:
+            helm:
+              name: "image.repository"
+              tag: "image.tag"
+    # PRD: stable versions only (0.1.0, 0.2.0)
+    - namePattern: "example-ui-prd"
+      images:
+        - alias: "app"
+          imageName: "shykhovmyron/example-ui:~0"
+          commonUpdateSettings:
+            updateStrategy: "semver"
+          manifestTargets:
+            helm:
+              name: "image.repository"
+              tag: "image.tag"
