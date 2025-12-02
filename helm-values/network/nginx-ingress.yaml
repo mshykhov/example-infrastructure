@@ -3,6 +3,11 @@
 # Chart: https://github.com/kubernetes/ingress-nginx/tree/main/charts/ingress-nginx
 
 controller:
+  # Auto-reload on ConfigMap changes (Reloader)
+  # Docs: https://kubernetes.github.io/ingress-nginx/examples/customization/custom-headers/#caveats
+  podAnnotations:
+    reloader.stakater.com/auto: "true"
+
   # ClusterIP - Tailscale Service will expose it
   service:
     type: ClusterIP
