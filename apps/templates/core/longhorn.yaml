@@ -18,16 +18,19 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
-  source:
-    # Official Helm chart - no changes needed
-    repoURL: https://charts.longhorn.io
-    chart: longhorn
-    # OPTIONAL: Update version as needed
-    targetRevision: "1.10.1"
-    helm:
-      values: |
-        preUpgradeChecker:
-          jobEnabled: false
+  sources:
+    - repoURL: https://charts.longhorn.io
+      chart: longhorn
+      targetRevision: "1.10.1"
+      helm:
+        valueFiles:
+          - $values/helm-values/core/longhorn.yaml
+        valuesObject:
+          preUpgradeChecker:
+            jobEnabled: false
+    - repoURL: {{ .Values.spec.source.repoURL }}
+      targetRevision: {{ .Values.spec.source.targetRevision }}
+      ref: values
   destination:
     server: {{ .Values.spec.destination.server }}
     namespace: longhorn-system

@@ -17,10 +17,16 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
-  source:
-    repoURL: https://stakater.github.io/stakater-charts
-    chart: reloader
-    targetRevision: "2.2.5"
+  sources:
+    - repoURL: https://stakater.github.io/stakater-charts
+      chart: reloader
+      targetRevision: "2.2.5"
+      helm:
+        valueFiles:
+          - $values/helm-values/core/reloader.yaml
+    - repoURL: {{ .Values.spec.source.repoURL }}
+      targetRevision: {{ .Values.spec.source.targetRevision }}
+      ref: values
   destination:
     server: {{ .Values.spec.destination.server }}
     namespace: reloader

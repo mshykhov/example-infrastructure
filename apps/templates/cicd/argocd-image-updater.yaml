@@ -19,27 +19,29 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
-  source:
-    repoURL: https://argoproj.github.io/argo-helm
-    chart: argocd-image-updater
-    targetRevision: "1.0.1"
-    helm:
-      values: |
-        config:
-          # Docker Hub registry configuration
-          registries:
-            - name: Docker Hub
-              api_url: https://registry-1.docker.io
-              prefix: docker.io
-              ping: yes
-              defaultns: library
-              default: true
-              credentials: pullsecret:argocd/dockerhub-credentials
-          # Log level
-          log.level: info
-        # Metrics for monitoring (Phase 7)
-        metrics:
-          enabled: true
+  sources:
+    - repoURL: https://argoproj.github.io/argo-helm
+      chart: argocd-image-updater
+      targetRevision: "1.0.1"
+      helm:
+        valueFiles:
+          - $values/helm-values/cicd/argocd-image-updater.yaml
+        valuesObject:
+          config:
+            registries:
+              - name: Docker Hub
+                api_url: https://registry-1.docker.io
+                prefix: docker.io
+                ping: yes
+                defaultns: library
+                default: true
+                credentials: pullsecret:argocd/dockerhub-credentials
+            log.level: info
+          metrics:
+            enabled: true
+    - repoURL: {{ .Values.spec.source.repoURL }}
+      targetRevision: {{ .Values.spec.source.targetRevision }}
+      ref: values
   destination:
     server: {{ .Values.spec.destination.server }}
     namespace: argocd
