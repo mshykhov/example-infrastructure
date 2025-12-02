@@ -1,0 +1,14 @@
+replicas: 2
+
+image:
+  repository: cloudflare/cloudflared
+  tag: "2024.11.0"
+  pullPolicy: IfNotPresent
+
+resources:
+  requests:
+    cpu: 10m
+    memory: 64Mi
+  limits:
+    cpu: 100m
+    memory: 128Mi

@@ -1,0 +1,46 @@
+# =============================================================================
+# CLOUDFLARE TUNNEL
+# =============================================================================
+# Docs: https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/
+#
+# Provides:
+# - Public access to PRD services via Cloudflare Edge
+# - DDoS protection, WAF, TLS termination
+# - Outbound-only connection (no firewall holes needed)
+#
+# Prerequisites:
+# - Cloudflare account with domain
+# - Tunnel created in Zero Trust Dashboard
+# - Doppler secret: CF_TUNNEL_TOKEN
+# - Public hostnames configured in Cloudflare Dashboard
+# =============================================================================
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cloudflare-tunnel
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "21"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: {{ .Values.spec.source.repoURL }}
+    targetRevision: {{ .Values.spec.source.targetRevision }}
+    path: charts/cloudflare-tunnel
+  destination:
+    server: {{ .Values.spec.destination.server }}
+    namespace: cloudflare
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

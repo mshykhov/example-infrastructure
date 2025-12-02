@@ -1,0 +1,6 @@
+apiVersion: v2
+name: cloudflare-tunnel
+description: Cloudflared tunnel connector for public access
+type: application
+version: 1.0.0
+appVersion: "2024.11.0"
