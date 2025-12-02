@@ -35,6 +35,16 @@ services:
       name: longhorn-frontend
       port: 80
 
+  grafana:
+    enabled: true
+    namespace: monitoring
+    allowedGroups:
+      - infra-admins
+      - monitoring-admins
+    backend:
+      name: kube-prometheus-stack-grafana
+      port: 80
+
   # =============================================================================
   # DEV Services (Tailscale only, oauth2: false disables OAuth2-Proxy)
   # =============================================================================
