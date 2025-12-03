@@ -11,7 +11,7 @@ longhornRecoveryBackend:
   replicas: 1
 
 persistence:
-  defaultClassReplicaCount: 2
+  defaultClassReplicaCount: 1
 
 csi:
   attacherReplicaCount: 1
