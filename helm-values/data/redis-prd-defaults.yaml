@@ -27,7 +27,7 @@ master:
       cpu: 200m
       memory: 256Mi
     limits:
-      cpu: 1000m
+      cpu: "1"
       memory: 512Mi
   persistence:
     enabled: true
@@ -44,7 +44,7 @@ replica:
       cpu: 200m
       memory: 256Mi
     limits:
-      cpu: 1000m
+      cpu: "1"
       memory: 512Mi
   persistence:
     enabled: true
