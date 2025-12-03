@@ -71,7 +71,7 @@ spec:
           targetRevision: "21.0.2"
           helm:
             valueFiles:
-              - $deploy/{{`{{ .path.path }}`}}
+              - $deploy/{{`{{ .path.path }}`}}/{{`{{ .path.filename }}`}}
               - $infra/helm-values/data/redis-{{`{{ .env }}`}}-defaults.yaml
         - repoURL: {{ .Values.deploy.repoURL }}
           targetRevision: {{ .Values.deploy.targetRevision }}

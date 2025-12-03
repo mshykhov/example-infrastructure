@@ -62,7 +62,7 @@ spec:
           targetRevision: "0.3.1"
           helm:
             valueFiles:
-              - $deploy/{{`{{ .path.path }}`}}
+              - $deploy/{{`{{ .path.path }}`}}/{{`{{ .path.filename }}`}}
               - $infra/helm-values/data/postgres-{{`{{ .env }}`}}-defaults.yaml
         - repoURL: {{ .Values.deploy.repoURL }}
           targetRevision: {{ .Values.deploy.targetRevision }}
