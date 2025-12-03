@@ -7,6 +7,9 @@
 # Service-specific values in deploy repo override these.
 # =============================================================================
 
+image:
+  tag: latest
+
 architecture: replication
 
 auth:
