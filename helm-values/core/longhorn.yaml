@@ -24,3 +24,6 @@ defaultSettings:
   guaranteedReplicaManagerCPU: 5
   concurrentReplicaRebuildPerNodeLimit: 2
   concurrentVolumeBackupRestorePerNodeLimit: 2
+  storageOverProvisioningPercentage: 200
+  storageMinimalAvailablePercentage: 10
+  replicaNodeLevelSoftAntiAffinity: true
