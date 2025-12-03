@@ -63,3 +63,24 @@ services:
     backend:
       name: example-ui-dev
       port: 8080
+
+  # =============================================================================
+  # PRD Services (NGINX Ingress only, no Tailscale)
+  # =============================================================================
+  example-api-prd:
+    enabled: true
+    oauth2: false
+    tailscale: false
+    namespace: example-api-prd
+    backend:
+      name: example-api-prd
+      port: 8080
+
+  example-ui-prd:
+    enabled: true
+    oauth2: false
+    tailscale: false
+    namespace: example-ui-prd
+    backend:
+      name: example-ui-prd
+      port: 8080
