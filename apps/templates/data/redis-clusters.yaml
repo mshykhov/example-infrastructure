@@ -68,7 +68,7 @@ spec:
       sources:
         - repoURL: https://charts.bitnami.com/bitnami
           chart: redis
-          targetRevision: "21.0.2"
+          targetRevision: "23.0.4"
           helm:
             valueFiles:
               - $deploy/{{`{{ .path.path }}`}}/{{`{{ .path.filename }}`}}
