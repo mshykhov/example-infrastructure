@@ -1,13 +1,18 @@
 # =============================================================================
-# REDIS CLUSTER DEFAULTS - PRD ENVIRONMENT
+# REDIS DEFAULTS - PRD ENVIRONMENT
 # =============================================================================
-# Applied to all Redis instances in prd environment.
-# Service-specific values override these.
+# Bitnami Redis chart defaults for prd environment.
+# Docs: https://github.com/bitnami/charts/tree/main/bitnami/redis
+#
+# Service-specific values in deploy repo override these.
 # =============================================================================
 
-redisReplication:
-  clusterSize: 3
-  tag: v7.0.15
+architecture: replication
+
+auth:
+  enabled: true
+
+master:
   resources:
     requests:
       cpu: 200m
@@ -15,19 +20,34 @@ redisReplication:
     limits:
       cpu: 1000m
       memory: 512Mi
+  persistence:
+    enabled: true
+    storageClass: longhorn
+    size: 5Gi
+  pdb:
+    create: true
+    minAvailable: 1
 
-storageSpec:
-  volumeClaimTemplate:
-    spec:
-      storageClassName: longhorn
-      accessModes: ["ReadWriteOnce"]
-      resources:
-        requests:
-          storage: 5Gi
+replica:
+  replicaCount: 2
+  resources:
+    requests:
+      cpu: 200m
+      memory: 256Mi
+    limits:
+      cpu: 1000m
+      memory: 512Mi
+  persistence:
+    enabled: true
+    storageClass: longhorn
+    size: 5Gi
+  pdb:
+    create: true
+    minAvailable: 1
 
-redisExporter:
+sentinel:
   enabled: true
-  tag: "v1.44.0"
+  quorum: 2
   resources:
     requests:
       cpu: 50m
@@ -36,10 +56,15 @@ redisExporter:
       cpu: 200m
       memory: 128Mi
 
-serviceMonitor:
+metrics:
   enabled: true
-  interval: 30s
-
-pdb:
-  enabled: true
-  minAvailable: 1
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+  serviceMonitor:
+    enabled: true
+    interval: 30s

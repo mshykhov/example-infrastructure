@@ -1,13 +1,18 @@
 # =============================================================================
-# REDIS CLUSTER DEFAULTS - DEV ENVIRONMENT
+# REDIS DEFAULTS - DEV ENVIRONMENT
 # =============================================================================
-# Applied to all Redis instances in dev environment.
-# Service-specific values override these.
+# Bitnami Redis chart defaults for dev environment.
+# Docs: https://github.com/bitnami/charts/tree/main/bitnami/redis
+#
+# Service-specific values in deploy repo override these.
 # =============================================================================
 
-redisReplication:
-  clusterSize: 1
-  tag: v7.0.15
+architecture: replication
+
+auth:
+  enabled: true
+
+master:
   resources:
     requests:
       cpu: 50m
@@ -15,19 +20,30 @@ redisReplication:
     limits:
       cpu: 200m
       memory: 128Mi
+  persistence:
+    enabled: true
+    storageClass: longhorn
+    size: 1Gi
 
-storageSpec:
-  volumeClaimTemplate:
-    spec:
-      storageClassName: longhorn
-      accessModes: ["ReadWriteOnce"]
-      resources:
-        requests:
-          storage: 1Gi
+replica:
+  replicaCount: 1
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+  persistence:
+    enabled: true
+    storageClass: longhorn
+    size: 1Gi
 
-redisExporter:
+sentinel:
+  enabled: false
+
+metrics:
   enabled: true
-  tag: "v1.44.0"
   resources:
     requests:
       cpu: 10m
@@ -35,7 +51,6 @@ redisExporter:
     limits:
       cpu: 100m
       memory: 64Mi
-
-serviceMonitor:
-  enabled: true
-  interval: 30s
+  serviceMonitor:
+    enabled: true
+    interval: 30s
