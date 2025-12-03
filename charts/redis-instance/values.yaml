@@ -88,9 +88,9 @@ podSecurityContext:
   runAsUser: 1000
   fsGroup: 1000
 
-# Password authentication
+# Password authentication (ExternalSecret from Doppler)
 auth:
   enabled: true
-  # If not set, operator will generate password
-  existingSecret: ""
   secretKey: password
+  secretStore: ""
+  key: ""
