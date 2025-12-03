@@ -2,27 +2,10 @@
 # REDIS DEFAULTS - PRD ENVIRONMENT
 # =============================================================================
 # OT-Container-Kit Redis Operator defaults for prd environment.
-# Docs: https://redis-operator.opstree.dev/
-#
-# Service-specific values in deploy repo override these.
+# Base values (images, etc) in charts/redis-instance/values.yaml
 # =============================================================================
 
 mode: sentinel
-
-image:
-  repository: quay.io/opstree/redis
-  tag: v7.4.1
-  pullPolicy: IfNotPresent
-
-exporter:
-  repository: quay.io/opstree/redis-exporter
-  tag: v1.44.0
-  pullPolicy: IfNotPresent
-
-sentinel:
-  repository: quay.io/opstree/redis-sentinel
-  tag: v7.4.1
-  pullPolicy: IfNotPresent
 
 clusterSize: 2
 
@@ -68,5 +51,3 @@ pdb:
 
 auth:
   enabled: true
-  existingSecret: ""
-  secretKey: password

@@ -15,7 +15,7 @@ name: ""
 # Tags: https://quay.io/repository/opstree/redis?tab=tags
 image:
   repository: quay.io/opstree/redis
-  tag: v7.4.1
+  tag: v7.0.15
   pullPolicy: IfNotPresent
 
 # Exporter image configuration
@@ -29,7 +29,7 @@ exporter:
 # Tags: https://quay.io/repository/opstree/redis-sentinel?tab=tags
 sentinel:
   repository: quay.io/opstree/redis-sentinel
-  tag: v7.4.1
+  tag: v7.0.15
   pullPolicy: IfNotPresent
 
 # Cluster size (replicas for replication/sentinel mode)
