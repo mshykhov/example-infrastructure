@@ -11,7 +11,7 @@ version:
   postgresql: "17"
 
 cluster:
-  instances: 2
+  instances: 1
 
   storage:
     storageClass: longhorn
