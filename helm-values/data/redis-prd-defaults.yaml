@@ -3,17 +3,23 @@
 # =============================================================================
 # Bitnami Redis chart defaults for prd environment.
 # Docs: https://github.com/bitnami/charts/tree/main/bitnami/redis
+# Chart: oci://registry-1.docker.io/bitnamicharts/redis
 #
 # Service-specific values in deploy repo override these.
+#
+# NOTE: Image tags are managed by chart version (appVersion).
+# Do NOT set image.tag - let the chart use its bundled version.
 # =============================================================================
-
-image:
-  tag: latest
 
 architecture: replication
 
 auth:
   enabled: true
+
+# Redis configuration (AOF for durability)
+commonConfiguration: |-
+  appendonly yes
+  save ""
 
 master:
   resources:
@@ -51,8 +57,6 @@ replica:
 sentinel:
   enabled: true
   quorum: 2
-  image:
-    tag: latest
   resources:
     requests:
       cpu: 50m
@@ -63,8 +67,6 @@ sentinel:
 
 metrics:
   enabled: true
-  image:
-    tag: latest
   resources:
     requests:
       cpu: 50m

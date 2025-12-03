@@ -3,17 +3,21 @@
 # =============================================================================
 # Bitnami Redis chart defaults for dev environment.
 # Docs: https://github.com/bitnami/charts/tree/main/bitnami/redis
+# Chart: oci://registry-1.docker.io/bitnamicharts/redis
 #
 # Service-specific values in deploy repo override these.
 # =============================================================================
 
-image:
-  tag: latest
-
-architecture: replication
+# Use standalone for dev - simpler, less resources
+architecture: standalone
 
 auth:
   enabled: true
+
+# Redis configuration
+commonConfiguration: |-
+  appendonly yes
+  save ""
 
 master:
   resources:
@@ -28,29 +32,8 @@ master:
     storageClass: longhorn
     size: 1Gi
 
-replica:
-  replicaCount: 1
-  resources:
-    requests:
-      cpu: 50m
-      memory: 64Mi
-    limits:
-      cpu: 200m
-      memory: 128Mi
-  persistence:
-    enabled: true
-    storageClass: longhorn
-    size: 1Gi
-
-sentinel:
-  enabled: false
-  image:
-    tag: latest
-
 metrics:
   enabled: true
-  image:
-    tag: latest
   resources:
     requests:
       cpu: 10m

@@ -25,16 +25,18 @@
 # ----------------------------------
 # Service naming: <service>-<instance>-redis-<env>-<suffix>
 #
-# Example for databases/example-api/redis/cache.yaml (dev):
-#   Release name: example-api-cache-redis-dev
+# DEV (standalone architecture):
+#   Release: example-api-cache-redis-dev
+#   Service: example-api-cache-redis-dev-master:6379
+#   Secret:  example-api-cache-redis-dev (key: redis-password)
 #
+# PRD (replication + sentinel architecture):
+#   Release: example-api-cache-redis-prd
 #   Services:
-#     example-api-cache-redis-dev-master    → master (read/write) :6379
-#     example-api-cache-redis-dev-replicas  → replicas (read-only) :6379
-#     example-api-cache-redis-dev-headless  → headless service
-#
-#   Secret:
-#     example-api-cache-redis-dev           → key: redis-password
+#     example-api-cache-redis-prd-master    → master (read/write) :6379
+#     example-api-cache-redis-prd-replicas  → replicas (read-only) :6379
+#     example-api-cache-redis-prd           → sentinel service :26379
+#   Secret:  example-api-cache-redis-prd (key: redis-password)
 #
 # Connection: <release>-master.<namespace>.svc.cluster.local:6379
 # =============================================================================
@@ -74,7 +76,7 @@ spec:
       sources:
         - repoURL: registry-1.docker.io/bitnamicharts
           chart: redis
-          targetRevision: "19.6.4"
+          targetRevision: "23.0.4"
           helm:
             ignoreMissingValueFiles: true
             valueFiles:
