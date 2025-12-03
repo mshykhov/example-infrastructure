@@ -9,11 +9,17 @@
 #
 # Structure:
 #   databases/<service>/postgres/<db-name>.yaml
+#   databases/<service>/postgres/<db-name>-<env>.yaml  (optional, per-env overrides)
 #
 # Examples:
-#   databases/example-api/postgres/main.yaml      → example-api-main-db-dev
-#   databases/example-api/postgres/analytics.yaml → example-api-analytics-db-dev
-#   databases/user-service/postgres/users.yaml    → user-service-users-db-dev
+#   databases/example-api/postgres/main.yaml          → base config (all envs)
+#   databases/example-api/postgres/main-dev.yaml      → dev overrides (optional)
+#   databases/example-api/postgres/main-prd.yaml      → prd overrides (optional)
+#
+# Value precedence (lowest to highest):
+#   1. Environment defaults (helm-values/data/postgres-<env>-defaults.yaml)
+#   2. Service config (databases/<service>/postgres/<db>.yaml)
+#   3. Service + env config (databases/<service>/postgres/<db>-<env>.yaml)
 #
 # CloudNativePG auto-generates secrets: <cluster-name>-app
 # Contains: username, password, uri, jdbc-uri, host, port, dbname
@@ -61,9 +67,14 @@ spec:
           chart: cluster
           targetRevision: "0.3.1"
           helm:
+            ignoreMissingValueFiles: true
             valueFiles:
-              - $deploy/{{`{{ .path.path }}`}}/{{`{{ .path.filename }}`}}
+              # 1. Environment defaults (base)
               - $infra/helm-values/data/postgres-{{`{{ .env }}`}}-defaults.yaml
+              # 2. Service config (overrides defaults)
+              - $deploy/{{`{{ .path.path }}`}}/{{`{{ .path.filename }}`}}
+              # 3. Service + env config (optional, highest priority)
+              - $deploy/{{`{{ .path.path }}`}}/{{`{{ trimSuffix ".yaml" .path.filename }}`}}-{{`{{ .env }}`}}.yaml
         - repoURL: {{ .Values.deploy.repoURL }}
           targetRevision: {{ .Values.deploy.targetRevision }}
           ref: deploy

@@ -9,11 +9,17 @@
 #
 # Structure:
 #   databases/<service>/redis/<instance-name>.yaml
+#   databases/<service>/redis/<instance-name>-<env>.yaml  (optional, per-env overrides)
 #
 # Examples:
-#   databases/example-api/redis/cache.yaml    → example-api-cache-redis-dev
-#   databases/example-api/redis/sessions.yaml → example-api-sessions-redis-dev
-#   databases/user-service/redis/tokens.yaml  → user-service-tokens-redis-dev
+#   databases/example-api/redis/cache.yaml          → base config (all envs)
+#   databases/example-api/redis/cache-dev.yaml      → dev overrides (optional)
+#   databases/example-api/redis/cache-prd.yaml      → prd overrides (optional)
+#
+# Value precedence (lowest to highest):
+#   1. Environment defaults (helm-values/data/redis-<env>-defaults.yaml)
+#   2. Service config (databases/<service>/redis/<instance>.yaml)
+#   3. Service + env config (databases/<service>/redis/<instance>-<env>.yaml)
 #
 # GENERATED SERVICES (Bitnami Redis):
 # ----------------------------------
@@ -68,11 +74,16 @@ spec:
       sources:
         - repoURL: registry-1.docker.io/bitnamicharts
           chart: redis
-          targetRevision: "20.6.0"
+          targetRevision: "24.0.0"
           helm:
+            ignoreMissingValueFiles: true
             valueFiles:
-              - $deploy/{{`{{ .path.path }}`}}/{{`{{ .path.filename }}`}}
+              # 1. Environment defaults (base)
               - $infra/helm-values/data/redis-{{`{{ .env }}`}}-defaults.yaml
+              # 2. Service config (overrides defaults)
+              - $deploy/{{`{{ .path.path }}`}}/{{`{{ .path.filename }}`}}
+              # 3. Service + env config (optional, highest priority)
+              - $deploy/{{`{{ .path.path }}`}}/{{`{{ trimSuffix ".yaml" .path.filename }}`}}-{{`{{ .env }}`}}.yaml
         - repoURL: {{ .Values.deploy.repoURL }}
           targetRevision: {{ .Values.deploy.targetRevision }}
           ref: deploy
