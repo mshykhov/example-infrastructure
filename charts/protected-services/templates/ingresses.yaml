@@ -26,7 +26,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: {{ $name }}.{{ $.Values.global.tailnet }}.ts.net
+    - host: {{ if $service.cloudflareHost }}{{ $service.cloudflareHost }}{{ else }}{{ $name }}.{{ $.Values.global.tailnet }}.ts.net{{ end }}
       http:
         paths:
           - path: /
