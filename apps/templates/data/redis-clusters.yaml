@@ -74,7 +74,7 @@ spec:
       sources:
         - repoURL: registry-1.docker.io/bitnamicharts
           chart: redis
-          targetRevision: "20.11.3"
+          targetRevision: "19.6.4"
           helm:
             ignoreMissingValueFiles: true
             valueFiles:
