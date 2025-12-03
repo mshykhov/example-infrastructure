@@ -65,6 +65,26 @@ services:
       port: 8080
 
   # =============================================================================
-  # PRD Services - Exposed via Cloudflare Tunnel + NGINX Ingress
+  # PRD Services - Public via Cloudflare Tunnel + NGINX Ingress
   # =============================================================================
-  # Moved to Ingress resources in deploy repo (untrustedonline.org / api.untrustedonline.org)
+  example-api-prd:
+    enabled: true
+    oauth2: false
+    tailscale: false
+    cloudflare: true
+    cloudflareHost: "api.untrustedonline.org"
+    namespace: example-api-prd
+    backend:
+      name: example-api-prd
+      port: 8080
+
+  example-ui-prd:
+    enabled: true
+    oauth2: false
+    tailscale: false
+    cloudflare: true
+    cloudflareHost: "untrustedonline.org"
+    namespace: example-ui-prd
+    backend:
+      name: example-ui-prd
+      port: 8080
