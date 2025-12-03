@@ -1,0 +1,44 @@
+{{- if eq .Values.mode "sentinel" }}
+# =============================================================================
+# REDIS SENTINEL
+# =============================================================================
+apiVersion: redis.redis.opstreelabs.in/v1beta2
+kind: RedisSentinel
+metadata:
+  name: {{ include "redis-instance.fullname" . }}-sentinel
+  labels:
+    {{- include "redis-instance.labels" . | nindent 4 }}
+spec:
+  clusterSize: 3
+  podSecurityContext:
+    runAsUser: {{ .Values.podSecurityContext.runAsUser }}
+    fsGroup: {{ .Values.podSecurityContext.fsGroup }}
+  {{- if .Values.pdb.enabled }}
+  pdb:
+    enabled: true
+    minAvailable: {{ .Values.pdb.minAvailable }}
+  {{- end }}
+  redisSentinelConfig:
+    redisReplicationName: {{ include "redis-instance.fullname" . }}
+    {{- if and .Values.auth.enabled .Values.auth.existingSecret }}
+    redisReplicationPassword:
+      secretKeyRef:
+        name: {{ .Values.auth.existingSecret }}
+        key: {{ .Values.auth.secretKey }}
+    {{- end }}
+  kubernetesConfig:
+    image: {{ .Values.sentinel.repository }}:{{ .Values.sentinel.tag }}
+    imagePullPolicy: {{ .Values.sentinel.pullPolicy }}
+    {{- if and .Values.auth.enabled .Values.auth.existingSecret }}
+    redisSecret:
+      name: {{ .Values.auth.existingSecret }}
+      key: {{ .Values.auth.secretKey }}
+    {{- end }}
+    resources:
+      requests:
+        cpu: {{ .Values.sentinelResources.requests.cpu }}
+        memory: {{ .Values.sentinelResources.requests.memory }}
+      limits:
+        cpu: {{ .Values.sentinelResources.limits.cpu }}
+        memory: {{ .Values.sentinelResources.limits.memory }}
+{{- end }}

@@ -1,8 +1,8 @@
 # =============================================================================
 # APPLICATIONSET - REDIS × SERVICES × ENVIRONMENTS
 # =============================================================================
-# Docs: https://github.com/bitnami/charts/tree/main/bitnami/redis
-# Chart: oci://registry-1.docker.io/bitnamicharts/redis
+# Operator: https://redis-operator.opstree.dev/
+# Chart: charts/redis-instance (local)
 #
 # Matrix Generator: databases/*/redis/*.yaml × environments (dev, prd)
 # Each microservice can have multiple Redis instances.
@@ -21,24 +21,20 @@
 #   2. Service config (databases/<service>/redis/<instance>.yaml)
 #   3. Service + env config (databases/<service>/redis/<instance>-<env>.yaml)
 #
-# GENERATED SERVICES (Bitnami Redis):
-# ----------------------------------
-# Service naming: <service>-<instance>-redis-<env>-<suffix>
+# GENERATED RESOURCES (OT Redis Operator):
+# ----------------------------------------
+# DEV (standalone mode):
+#   Redis CRD: <service>-<instance>-<env> (e.g., example-api-cache-dev)
+#   Service:   <service>-<instance>-<env>:6379
 #
-# DEV (standalone architecture):
-#   Release: example-api-cache-redis-dev
-#   Service: example-api-cache-redis-dev-master:6379
-#   Secret:  example-api-cache-redis-dev (key: redis-password)
-#
-# PRD (replication + sentinel architecture):
-#   Release: example-api-cache-redis-prd
+# PRD (sentinel mode):
+#   RedisReplication CRD: <service>-<instance>-<env>
+#   RedisSentinel CRD:    <service>-<instance>-<env>-sentinel
 #   Services:
-#     example-api-cache-redis-prd-master    → master (read/write) :6379
-#     example-api-cache-redis-prd-replicas  → replicas (read-only) :6379
-#     example-api-cache-redis-prd           → sentinel service :26379
-#   Secret:  example-api-cache-redis-prd (key: redis-password)
+#     <name>:6379           → Redis (master elected by sentinel)
+#     <name>-sentinel:26379 → Sentinel
 #
-# Connection: <release>-master.<namespace>.svc.cluster.local:6379
+# Connection: <name>.<namespace>.svc.cluster.local:6379
 # =============================================================================
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
@@ -74,24 +70,24 @@ spec:
     spec:
       project: default
       sources:
-        - repoURL: registry-1.docker.io/bitnamicharts
-          chart: redis
-          targetRevision: "23.2.12"
+        - repoURL: {{ .Values.spec.source.repoURL }}
+          targetRevision: {{ .Values.spec.source.targetRevision }}
+          path: charts/redis-instance
           helm:
+            releaseName: '{{`{{ index .path.segments 1 }}`}}-{{`{{ trimSuffix ".yaml" .path.filename }}`}}-{{`{{ .env }}`}}'
             ignoreMissingValueFiles: true
             valueFiles:
               # 1. Environment defaults (base)
-              - $infra/helm-values/data/redis-{{`{{ .env }}`}}-defaults.yaml
+              - ../../helm-values/data/redis-{{`{{ .env }}`}}-defaults.yaml
               # 2. Service config (overrides defaults)
               - $deploy/{{`{{ .path.path }}`}}/{{`{{ .path.filename }}`}}
               # 3. Service + env config (optional, highest priority)
               - $deploy/{{`{{ .path.path }}`}}/{{`{{ trimSuffix ".yaml" .path.filename }}`}}-{{`{{ .env }}`}}.yaml
+            values: |
+              name: {{`{{ index .path.segments 1 }}`}}-{{`{{ trimSuffix ".yaml" .path.filename }}`}}-{{`{{ .env }}`}}
         - repoURL: {{ .Values.deploy.repoURL }}
           targetRevision: {{ .Values.deploy.targetRevision }}
           ref: deploy
-        - repoURL: {{ .Values.spec.source.repoURL }}
-          targetRevision: {{ .Values.spec.source.targetRevision }}
-          ref: infra
       destination:
         server: {{ .Values.spec.destination.server }}
         namespace: '{{`{{ index .path.segments 1 }}`}}-{{`{{ .env }}`}}'

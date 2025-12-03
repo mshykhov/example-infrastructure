@@ -1,0 +1,19 @@
+{{- if and .Values.redisExporter.enabled .Values.serviceMonitor.enabled }}
+# =============================================================================
+# SERVICE MONITOR FOR PROMETHEUS
+# =============================================================================
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "redis-instance.fullname" . }}
+  labels:
+    {{- include "redis-instance.labels" . | nindent 4 }}
+    release: kube-prometheus-stack
+spec:
+  selector:
+    matchLabels:
+      app: {{ include "redis-instance.fullname" . }}
+  endpoints:
+    - port: redis-exporter
+      interval: {{ .Values.serviceMonitor.interval }}
+{{- end }}

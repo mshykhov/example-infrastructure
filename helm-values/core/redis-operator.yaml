@@ -1,0 +1,16 @@
+# =============================================================================
+# REDIS OPERATOR VALUES
+# =============================================================================
+# Docs: https://redis-operator.opstree.dev/
+# =============================================================================
+
+redisOperator:
+  imagePullPolicy: IfNotPresent
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 500Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi

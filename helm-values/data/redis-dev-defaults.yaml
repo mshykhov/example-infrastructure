@@ -1,46 +1,56 @@
 # =============================================================================
 # REDIS DEFAULTS - DEV ENVIRONMENT
 # =============================================================================
-# Bitnami Redis chart defaults for dev environment.
-# Docs: https://github.com/bitnami/charts/tree/main/bitnami/redis
-# Chart: oci://registry-1.docker.io/bitnamicharts/redis
+# OT-Container-Kit Redis Operator defaults for dev environment.
+# Docs: https://redis-operator.opstree.dev/
 #
 # Service-specific values in deploy repo override these.
 # =============================================================================
 
-# Use standalone for dev - simpler, less resources
-architecture: standalone
+mode: standalone
+
+image:
+  repository: quay.io/opstree/redis
+  tag: v7.4.1
+  pullPolicy: IfNotPresent
+
+exporter:
+  repository: quay.io/opstree/redis-exporter
+  tag: v1.44.0
+  pullPolicy: IfNotPresent
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 200m
+    memory: 128Mi
+
+exporterResources:
+  requests:
+    cpu: 10m
+    memory: 32Mi
+  limits:
+    cpu: 50m
+    memory: 64Mi
+
+storage:
+  enabled: true
+  storageClass: longhorn
+  size: 1Gi
+
+redisExporter:
+  enabled: true
+
+serviceMonitor:
+  enabled: true
+  interval: 30s
+
+pdb:
+  enabled: false
 
 auth:
   enabled: true
-
-# Redis configuration
-commonConfiguration: |-
-  appendonly yes
-  save ""
-
-master:
-  resources:
-    requests:
-      cpu: 50m
-      memory: 64Mi
-    limits:
-      cpu: 200m
-      memory: 128Mi
-  persistence:
-    enabled: true
-    storageClass: longhorn
-    size: 1Gi
-
-metrics:
-  enabled: true
-  resources:
-    requests:
-      cpu: 10m
-      memory: 32Mi
-    limits:
-      cpu: 100m
-      memory: 64Mi
-  serviceMonitor:
-    enabled: true
-    interval: 30s
+  existingSecret: ""
+  secretKey: password

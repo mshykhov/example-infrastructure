@@ -1,0 +1,96 @@
+# =============================================================================
+# REDIS INSTANCE VALUES
+# =============================================================================
+# This chart creates Redis CRDs for OT-Container-Kit Redis Operator
+# Docs: https://redis-operator.opstree.dev/
+# =============================================================================
+
+# Redis mode: standalone, replication, sentinel
+mode: standalone
+
+# Name will be set by ApplicationSet
+name: ""
+
+# Redis image configuration
+# Tags: https://quay.io/repository/opstree/redis?tab=tags
+image:
+  repository: quay.io/opstree/redis
+  tag: v7.4.1
+  pullPolicy: IfNotPresent
+
+# Exporter image configuration
+# Tags: https://quay.io/repository/opstree/redis-exporter?tab=tags
+exporter:
+  repository: quay.io/opstree/redis-exporter
+  tag: v1.44.0
+  pullPolicy: IfNotPresent
+
+# Sentinel image configuration (only for sentinel mode)
+# Tags: https://quay.io/repository/opstree/redis-sentinel?tab=tags
+sentinel:
+  repository: quay.io/opstree/redis-sentinel
+  tag: v7.4.1
+  pullPolicy: IfNotPresent
+
+# Cluster size (replicas for replication/sentinel mode)
+# 2 = 1 master + 1 replica, 3 = 1 master + 2 replicas
+clusterSize: 2
+
+# Resources for Redis pods
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
+
+# Resources for exporter sidecar
+exporterResources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 100m
+    memory: 128Mi
+
+# Resources for sentinel pods
+sentinelResources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 100m
+    memory: 128Mi
+
+# Storage configuration
+storage:
+  enabled: true
+  storageClass: longhorn
+  size: 1Gi
+
+# Redis exporter (Prometheus metrics)
+redisExporter:
+  enabled: true
+
+# ServiceMonitor for Prometheus
+serviceMonitor:
+  enabled: true
+  interval: 30s
+
+# Pod Disruption Budget
+pdb:
+  enabled: false
+  minAvailable: 1
+
+# Security context
+podSecurityContext:
+  runAsUser: 1000
+  fsGroup: 1000
+
+# Password authentication
+auth:
+  enabled: true
+  # If not set, operator will generate password
+  existingSecret: ""
+  secretKey: password

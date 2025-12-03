@@ -1,0 +1,53 @@
+{{- if eq .Values.mode "standalone" }}
+# =============================================================================
+# REDIS STANDALONE
+# =============================================================================
+apiVersion: redis.redis.opstreelabs.in/v1beta2
+kind: Redis
+metadata:
+  name: {{ include "redis-instance.fullname" . }}
+  labels:
+    {{- include "redis-instance.labels" . | nindent 4 }}
+spec:
+  podSecurityContext:
+    runAsUser: {{ .Values.podSecurityContext.runAsUser }}
+    fsGroup: {{ .Values.podSecurityContext.fsGroup }}
+  kubernetesConfig:
+    image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+    imagePullPolicy: {{ .Values.image.pullPolicy }}
+    resources:
+      requests:
+        cpu: {{ .Values.resources.requests.cpu }}
+        memory: {{ .Values.resources.requests.memory }}
+      limits:
+        cpu: {{ .Values.resources.limits.cpu }}
+        memory: {{ .Values.resources.limits.memory }}
+    {{- if and .Values.auth.enabled .Values.auth.existingSecret }}
+    redisSecret:
+      name: {{ .Values.auth.existingSecret }}
+      key: {{ .Values.auth.secretKey }}
+    {{- end }}
+  {{- if .Values.redisExporter.enabled }}
+  redisExporter:
+    enabled: true
+    image: {{ .Values.exporter.repository }}:{{ .Values.exporter.tag }}
+    imagePullPolicy: {{ .Values.exporter.pullPolicy }}
+    resources:
+      requests:
+        cpu: {{ .Values.exporterResources.requests.cpu }}
+        memory: {{ .Values.exporterResources.requests.memory }}
+      limits:
+        cpu: {{ .Values.exporterResources.limits.cpu }}
+        memory: {{ .Values.exporterResources.limits.memory }}
+  {{- end }}
+  {{- if .Values.storage.enabled }}
+  storage:
+    volumeClaimTemplate:
+      spec:
+        storageClassName: {{ .Values.storage.storageClass }}
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: {{ .Values.storage.size }}
+  {{- end }}
+{{- end }}
