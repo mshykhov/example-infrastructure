@@ -40,3 +40,4 @@ pdb:
 
 auth:
   enabled: true
+  secretStore: doppler-dev
