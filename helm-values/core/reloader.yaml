@@ -1,4 +1,5 @@
 reloader:
+  autoReloadAll: true
   deployment:
     resources:
       requests:

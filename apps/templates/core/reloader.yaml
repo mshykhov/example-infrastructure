@@ -4,7 +4,7 @@
 # Docs: https://github.com/stakater/Reloader
 #
 # Watches Secrets/ConfigMaps and automatically triggers rollouts when they change.
-# Add annotation to deployments: reloader.stakater.com/auto: "true"
+# Mode: autoReloadAll=true (no annotations needed)
 # =============================================================================
 apiVersion: argoproj.io/v1alpha1
 kind: Application
