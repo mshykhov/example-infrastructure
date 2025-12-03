@@ -91,6 +91,11 @@ spec:
       destination:
         server: {{ .Values.spec.destination.server }}
         namespace: '{{`{{ index .path.segments 1 }}`}}-{{`{{ .env }}`}}'
+      ignoreDifferences:
+        - group: ""
+          kind: Secret
+          jsonPointers:
+            - /data/password
       syncPolicy:
         automated:
           prune: true
@@ -98,6 +103,7 @@ spec:
         syncOptions:
           - CreateNamespace=true
           - ServerSideApply=true
+          - RespectIgnoreDifferences=true
         retry:
           limit: 5
           backoff:
