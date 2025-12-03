@@ -22,9 +22,9 @@ spec:
       limits:
         cpu: {{ .Values.resources.limits.cpu }}
         memory: {{ .Values.resources.limits.memory }}
-    {{- if and .Values.auth.enabled .Values.auth.existingSecret }}
+    {{- if .Values.auth.enabled }}
     redisSecret:
-      name: {{ .Values.auth.existingSecret }}
+      name: {{ include "redis-instance.secretName" . }}
       key: {{ .Values.auth.secretKey }}
     {{- end }}
   {{- if .Values.redisExporter.enabled }}

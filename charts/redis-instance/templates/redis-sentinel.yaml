@@ -20,18 +20,18 @@ spec:
   {{- end }}
   redisSentinelConfig:
     redisReplicationName: {{ include "redis-instance.fullname" . }}
-    {{- if and .Values.auth.enabled .Values.auth.existingSecret }}
+    {{- if .Values.auth.enabled }}
     redisReplicationPassword:
       secretKeyRef:
-        name: {{ .Values.auth.existingSecret }}
+        name: {{ include "redis-instance.secretName" . }}
         key: {{ .Values.auth.secretKey }}
     {{- end }}
   kubernetesConfig:
     image: {{ .Values.sentinel.repository }}:{{ .Values.sentinel.tag }}
     imagePullPolicy: {{ .Values.sentinel.pullPolicy }}
-    {{- if and .Values.auth.enabled .Values.auth.existingSecret }}
+    {{- if .Values.auth.enabled }}
     redisSecret:
-      name: {{ .Values.auth.existingSecret }}
+      name: {{ include "redis-instance.secretName" . }}
       key: {{ .Values.auth.secretKey }}
     {{- end }}
     resources:

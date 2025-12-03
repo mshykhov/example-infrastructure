@@ -20,3 +20,14 @@ app.kubernetes.io/name: {{ include "redis-instance.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
+
+{{/*
+Secret name - use existing or auto-generated
+*/}}
+{{- define "redis-instance.secretName" -}}
+{{- if .Values.auth.existingSecret -}}
+{{- .Values.auth.existingSecret -}}
+{{- else -}}
+{{- include "redis-instance.fullname" . -}}
+{{- end -}}
+{{- end -}}
