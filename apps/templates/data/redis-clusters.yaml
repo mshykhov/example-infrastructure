@@ -66,9 +66,9 @@ spec:
     spec:
       project: default
       sources:
-        - repoURL: https://charts.bitnami.com/bitnami
+        - repoURL: registry-1.docker.io/bitnamicharts
           chart: redis
-          targetRevision: "23.0.4"
+          targetRevision: "20.6.0"
           helm:
             valueFiles:
               - $deploy/{{`{{ .path.path }}`}}/{{`{{ .path.filename }}`}}
