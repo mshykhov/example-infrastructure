@@ -1,0 +1,43 @@
+# =============================================================================
+# REDIS OPERATOR - REDIS FOR KUBERNETES
+# =============================================================================
+# Docs: https://ot-container-kit.github.io/redis-operator/
+# Helm: https://github.com/OT-CONTAINER-KIT/redis-operator/tree/master/charts
+#
+# Provides:
+# - Redis Standalone, Replication, Cluster, Sentinel modes
+# - Automated failover and HA
+# - Prometheus monitoring
+# - TLS and ACL support
+# =============================================================================
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: redis-operator
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "5"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  sources:
+    - repoURL: https://ot-container-kit.github.io/helm-charts/
+      chart: redis-operator
+      targetRevision: "0.22.2"
+      helm:
+        valueFiles:
+          - $values/helm-values/core/redis-operator.yaml
+    - repoURL: {{ .Values.spec.source.repoURL }}
+      targetRevision: {{ .Values.spec.source.targetRevision }}
+      ref: values
+  destination:
+    server: {{ .Values.spec.destination.server }}
+    namespace: redis-operator-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

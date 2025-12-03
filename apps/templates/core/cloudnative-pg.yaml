@@ -1,0 +1,43 @@
+# =============================================================================
+# CLOUDNATIVE-PG OPERATOR - POSTGRESQL FOR KUBERNETES
+# =============================================================================
+# Docs: https://cloudnative-pg.io/documentation/current/
+# Helm: https://github.com/cloudnative-pg/charts
+#
+# CNCF Incubating project. Provides:
+# - Declarative PostgreSQL cluster management
+# - Automated failover and HA
+# - Rolling updates
+# - Integrated Prometheus monitoring
+# =============================================================================
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cloudnative-pg
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "5"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  sources:
+    - repoURL: https://cloudnative-pg.github.io/charts
+      chart: cloudnative-pg
+      targetRevision: "0.26.1"
+      helm:
+        valueFiles:
+          - $values/helm-values/core/cloudnative-pg.yaml
+    - repoURL: {{ .Values.spec.source.repoURL }}
+      targetRevision: {{ .Values.spec.source.targetRevision }}
+      ref: values
+  destination:
+    server: {{ .Values.spec.destination.server }}
+    namespace: cnpg-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

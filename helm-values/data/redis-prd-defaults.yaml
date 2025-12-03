@@ -1,0 +1,45 @@
+# =============================================================================
+# REDIS CLUSTER DEFAULTS - PRD ENVIRONMENT
+# =============================================================================
+# Applied to all Redis instances in prd environment.
+# Service-specific values override these.
+# =============================================================================
+
+redisReplication:
+  clusterSize: 3
+  tag: v7.0.15
+  resources:
+    requests:
+      cpu: 200m
+      memory: 256Mi
+    limits:
+      cpu: 1000m
+      memory: 512Mi
+
+storageSpec:
+  volumeClaimTemplate:
+    spec:
+      storageClassName: longhorn
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 5Gi
+
+redisExporter:
+  enabled: true
+  tag: "v1.44.0"
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+
+serviceMonitor:
+  enabled: true
+  interval: 30s
+
+pdb:
+  enabled: true
+  minAvailable: 1

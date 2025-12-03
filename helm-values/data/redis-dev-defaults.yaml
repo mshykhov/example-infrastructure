@@ -1,0 +1,41 @@
+# =============================================================================
+# REDIS CLUSTER DEFAULTS - DEV ENVIRONMENT
+# =============================================================================
+# Applied to all Redis instances in dev environment.
+# Service-specific values override these.
+# =============================================================================
+
+redisReplication:
+  clusterSize: 1
+  tag: v7.0.15
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+
+storageSpec:
+  volumeClaimTemplate:
+    spec:
+      storageClassName: longhorn
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 1Gi
+
+redisExporter:
+  enabled: true
+  tag: "v1.44.0"
+  resources:
+    requests:
+      cpu: 10m
+      memory: 32Mi
+    limits:
+      cpu: 100m
+      memory: 64Mi
+
+serviceMonitor:
+  enabled: true
+  interval: 30s

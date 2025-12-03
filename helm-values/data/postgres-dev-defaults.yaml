@@ -1,0 +1,30 @@
+# =============================================================================
+# POSTGRESQL CLUSTER DEFAULTS - DEV ENVIRONMENT
+# =============================================================================
+# Applied to all PostgreSQL clusters in dev environment.
+# Service-specific values in <service>-db.yaml override these.
+# =============================================================================
+
+type: postgresql
+
+version:
+  postgresql: "17"
+
+cluster:
+  instances: 1
+
+  storage:
+    storageClass: longhorn
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+  monitoring:
+    enabled: true
+    podMonitor:
+      enabled: true

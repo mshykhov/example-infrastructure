@@ -1,0 +1,76 @@
+# =============================================================================
+# APPLICATIONSET - REDIS CLUSTERS × SERVICES × ENVIRONMENTS
+# =============================================================================
+# Docs: https://ot-container-kit.github.io/redis-operator/
+# Chart: https://github.com/OT-CONTAINER-KIT/redis-operator/tree/master/charts
+#
+# Matrix Generator: databases/*/redis/*.yaml × environments (dev, prd)
+# Each microservice can have multiple Redis instances.
+#
+# Structure:
+#   databases/<service>/redis/<instance-name>.yaml
+#
+# Examples:
+#   databases/example-api/redis/cache.yaml    → example-api-cache-redis-dev
+#   databases/example-api/redis/sessions.yaml → example-api-sessions-redis-dev
+#   databases/user-service/redis/tokens.yaml  → user-service-tokens-redis-dev
+#
+# Connection: <cluster-name>-redis-replication.<namespace>.svc:6379
+# =============================================================================
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: redis-clusters
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+    - matrix:
+        generators:
+          - list:
+              elements:
+                - env: dev
+                - env: prd
+          - git:
+              repoURL: {{ .Values.deploy.repoURL }}
+              revision: {{ .Values.deploy.targetRevision }}
+              files:
+                - path: databases/*/redis/*.yaml
+  template:
+    metadata:
+      # service-instance-redis-env (e.g., example-api-cache-redis-dev)
+      name: '{{`{{ index .path.segments 1 }}`}}-{{`{{ trimSuffix ".yaml" .path.filename }}`}}-redis-{{`{{ .env }}`}}'
+      labels:
+        app: '{{`{{ index .path.segments 1 }}`}}'
+        instance: '{{`{{ trimSuffix ".yaml" .path.filename }}`}}'
+        env: '{{`{{ .env }}`}}'
+        type: redis
+    spec:
+      project: default
+      sources:
+        - repoURL: https://ot-container-kit.github.io/helm-charts/
+          chart: redis-replication
+          targetRevision: "0.22.2"
+          helm:
+            valueFiles:
+              - $deploy/{{`{{ .path.path }}`}}
+              - $infra/helm-values/data/redis-{{`{{ .env }}`}}-defaults.yaml
+        - repoURL: {{ .Values.deploy.repoURL }}
+          targetRevision: {{ .Values.deploy.targetRevision }}
+          ref: deploy
+        - repoURL: {{ .Values.spec.source.repoURL }}
+          targetRevision: {{ .Values.spec.source.targetRevision }}
+          ref: infra
+      destination:
+        server: {{ .Values.spec.destination.server }}
+        namespace: '{{`{{ index .path.segments 1 }}`}}-{{`{{ .env }}`}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          - ServerSideApply=true

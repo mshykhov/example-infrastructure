@@ -1,0 +1,35 @@
+# =============================================================================
+# POSTGRESQL CLUSTER DEFAULTS - PRD ENVIRONMENT
+# =============================================================================
+# Applied to all PostgreSQL clusters in prd environment.
+# Service-specific values in <service>-db.yaml override these.
+# =============================================================================
+
+type: postgresql
+
+version:
+  postgresql: "17"
+
+cluster:
+  instances: 3
+
+  storage:
+    storageClass: longhorn
+
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+
+  monitoring:
+    enabled: true
+    podMonitor:
+      enabled: true
+    prometheusRule:
+      enabled: true
+
+  affinity:
+    topologyKey: kubernetes.io/hostname

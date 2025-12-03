@@ -1,0 +1,21 @@
+# =============================================================================
+# CLOUDNATIVE-PG OPERATOR VALUES
+# =============================================================================
+# Docs: https://cloudnative-pg.io/documentation/current/
+# Chart: https://github.com/cloudnative-pg/charts/tree/main/charts/cloudnative-pg
+# =============================================================================
+
+monitoring:
+  podMonitorEnabled: true
+  grafanaDashboard:
+    create: true
+    labels:
+      grafana_dashboard: "1"
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
