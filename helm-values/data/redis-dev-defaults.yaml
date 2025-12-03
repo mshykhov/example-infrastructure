@@ -44,9 +44,13 @@ replica:
 
 sentinel:
   enabled: false
+  image:
+    tag: latest
 
 metrics:
   enabled: true
+  image:
+    tag: latest
   resources:
     requests:
       cpu: 10m

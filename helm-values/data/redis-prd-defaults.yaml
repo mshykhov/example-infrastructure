@@ -51,6 +51,8 @@ replica:
 sentinel:
   enabled: true
   quorum: 2
+  image:
+    tag: latest
   resources:
     requests:
       cpu: 50m
@@ -61,6 +63,8 @@ sentinel:
 
 metrics:
   enabled: true
+  image:
+    tag: latest
   resources:
     requests:
       cpu: 50m
