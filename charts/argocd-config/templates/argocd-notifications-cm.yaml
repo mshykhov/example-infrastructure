@@ -20,16 +20,18 @@ data:
       {{`{{- else if .app.spec.sources -}}`}}
         {{`{{- $repoURL = (index .app.spec.sources 0).repoURL -}}`}}
       {{`{{- end -}}`}}
-      {{`{{- $commitURL := "" -}}`}}
-      {{`{{- if contains "github.com" $repoURL -}}`}}
-        {{`{{- $commitURL = printf "%s/commit/%s" (trimSuffix ".git" $repoURL) $revision -}}`}}
+      {{`{{- $httpsURL := $repoURL -}}`}}
+      {{`{{- if hasPrefix "git@github.com:" $repoURL -}}`}}
+        {{`{{- $httpsURL = printf "https://github.com/%s" (trimSuffix ".git" (trimPrefix "git@github.com:" $repoURL)) -}}`}}
+      {{`{{- else -}}`}}
+        {{`{{- $httpsURL = trimSuffix ".git" $repoURL -}}`}}
       {{`{{- end -}}`}}
       ✅ <b>{{`{{ .app.metadata.name }}`}}</b>
 
       📦 Deployed successfully
       🏷 Namespace: <code>{{`{{ .app.spec.destination.namespace }}`}}</code>
-      {{`{{- if $commitURL }}`}}
-      🔗 Revision: <a href="{{`{{ $commitURL }}`}}">{{`{{ $shortRev }}`}}</a>
+      {{`{{- if contains "github.com" $repoURL }}`}}
+      🔗 Revision: <a href="{{`{{ $httpsURL }}`}}/commit/{{`{{ $revision }}`}}">{{`{{ $shortRev }}`}}</a>
       {{`{{- else }}`}}
       🔗 Revision: <code>{{`{{ $shortRev }}`}}</code>
       {{`{{- end }}`}}
