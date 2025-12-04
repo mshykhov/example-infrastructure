@@ -69,14 +69,6 @@ data:
 
       🔗 [Open in ArgoCD]({{`{{ .context.argocdUrl }}`}}/applications/{{`{{ .app.metadata.name }}`}})
 
-  template.app-sync-running: |
-    message: |
-      🔄 *{{`{{ .app.metadata.name }}`}}*
-
-      ⏳ Sync in progress
-      🏷 Namespace: `{{`{{ .app.spec.destination.namespace }}`}}`
-      🔗 Revision: `{{`{{ .app.status.sync.revision | trunc 7 }}`}}`
-
   template.app-sync-succeeded: |
     message: |
       ✓ *{{`{{ .app.metadata.name }}`}}*
@@ -106,13 +98,6 @@ data:
         - app-health-degraded
       when: app.status.health.status == 'Degraded'
 
-  trigger.on-sync-running: |
-    - description: Application sync is running
-      oncePer: app.status.operationState.syncResult.revision
-      send:
-        - app-sync-running
-      when: app.status.operationState != nil and app.status.operationState.phase in ['Running']
-
   subscriptions: |
     # Deploy notifications - only for apps with deploy-notify=true label
     - recipients:
@@ -120,11 +105,6 @@ data:
       selector: deploy-notify=true
       triggers:
         - on-deployed
-    # Info notifications - all apps
-    - recipients:
-        - telegram:{{ .Values.global.telegram.chatId }}|{{ .Values.global.telegram.topics.info }}
-      triggers:
-        - on-sync-running
     # Critical notifications - all apps
     - recipients:
         - telegram:{{ .Values.global.telegram.chatId }}|{{ .Values.global.telegram.topics.critical }}
