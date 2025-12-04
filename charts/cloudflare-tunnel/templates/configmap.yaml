@@ -11,4 +11,4 @@ data:
     no-autoupdate: true
 
     ingress:
-      - service: http://nginx-ingress-ingress-nginx-controller.nginx-ingress.svc.cluster.local:80
+      - service: http://nginx-ingress-ingress-nginx-controller.ingress-nginx.svc.cluster.local:80
