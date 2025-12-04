@@ -1,0 +1,134 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-notifications-cm
+  namespace: argocd
+data:
+  service.telegram: |
+    token: $telegram-token
+
+  context: |
+    argocdUrl: https://argocd.{{ .Values.global.tailnet }}.ts.net
+
+  template.app-deployed: |
+    message: |
+      {{`{{- $revision := .app.status.sync.revision -}}`}}
+      {{`{{- $shortRev := (trunc 7 $revision) -}}`}}
+      {{`{{- $repoURL := "" -}}`}}
+      {{`{{- if .app.spec.source -}}`}}
+        {{`{{- $repoURL = .app.spec.source.repoURL -}}`}}
+      {{`{{- else if .app.spec.sources -}}`}}
+        {{`{{- $repoURL = (index .app.spec.sources 0).repoURL -}}`}}
+      {{`{{- end -}}`}}
+      {{`{{- $commitURL := "" -}}`}}
+      {{`{{- if contains "github.com" $repoURL -}}`}}
+        {{`{{- $commitURL = printf "%s/commit/%s" (trimSuffix ".git" $repoURL) $revision -}}`}}
+      {{`{{- end -}}`}}
+      ✅ <b>{{`{{ .app.metadata.name }}`}}</b>
+
+      📦 Deployed successfully
+      🏷 Namespace: <code>{{`{{ .app.spec.destination.namespace }}`}}</code>
+      {{`{{- if $commitURL }}`}}
+      🔗 Revision: <a href="{{`{{ $commitURL }}`}}">{{`{{ $shortRev }}`}}</a>
+      {{`{{- else }}`}}
+      🔗 Revision: <code>{{`{{ $shortRev }}`}}</code>
+      {{`{{- end }}`}}
+      {{`{{- if (call .repo.GetCommitMetadata .app.status.sync.revision).Message }}`}}
+      💬 {{`{{ (call .repo.GetCommitMetadata .app.status.sync.revision).Message | trunc 100 }}`}}
+      {{`{{- end }}`}}
+
+      🔗 <a href="{{`{{ .context.argocdUrl }}`}}/applications/{{`{{ .app.metadata.name }}`}}">Open in ArgoCD</a>
+
+  template.app-sync-failed: |
+    message: |
+      ❌ <b>{{`{{ .app.metadata.name }}`}}</b>
+
+      🚫 Sync failed
+      🏷 Namespace: <code>{{`{{ .app.spec.destination.namespace }}`}}</code>
+      {{`{{- if .app.status.operationState.message }}`}}
+      ⚠️ Error: {{`{{ .app.status.operationState.message | trunc 200 }}`}}
+      {{`{{- end }}`}}
+      {{`{{- range $c := .app.status.conditions }}`}}
+      • {{`{{ $c.type }}`}}: {{`{{ $c.message | trunc 100 }}`}}
+      {{`{{- end }}`}}
+
+      🔗 <a href="{{`{{ .context.argocdUrl }}`}}/applications/{{`{{ .app.metadata.name }}`}}?operation=true">View Details</a>
+
+  template.app-health-degraded: |
+    message: |
+      ⚠️ <b>{{`{{ .app.metadata.name }}`}}</b>
+
+      💔 Health degraded
+      🏷 Namespace: <code>{{`{{ .app.spec.destination.namespace }}`}}</code>
+      📊 Status: <code>{{`{{ .app.status.health.status }}`}}</code>
+      {{`{{- range $c := .app.status.conditions }}`}}
+      • {{`{{ $c.type }}`}}: {{`{{ $c.message | trunc 100 }}`}}
+      {{`{{- end }}`}}
+
+      🔗 <a href="{{`{{ .context.argocdUrl }}`}}/applications/{{`{{ .app.metadata.name }}`}}">Open in ArgoCD</a>
+
+  template.app-sync-running: |
+    message: |
+      🔄 <b>{{`{{ .app.metadata.name }}`}}</b>
+
+      ⏳ Sync in progress
+      🏷 Namespace: <code>{{`{{ .app.spec.destination.namespace }}`}}</code>
+      🔗 Revision: <code>{{`{{ .app.status.sync.revision | trunc 7 }}`}}</code>
+
+  template.app-sync-succeeded: |
+    message: |
+      ✓ <b>{{`{{ .app.metadata.name }}`}}</b>
+
+      🔄 Sync completed
+      🏷 Namespace: <code>{{`{{ .app.spec.destination.namespace }}`}}</code>
+      🔗 Revision: <code>{{`{{ .app.status.sync.revision | trunc 7 }}`}}</code>
+
+  trigger.on-deployed: |
+    - description: Application is synced and healthy
+      oncePer: app.status.operationState.syncResult.revision
+      send:
+        - app-deployed
+      when: app.status.operationState != nil and app.status.operationState.phase in ['Succeeded'] and app.status.health.status == 'Healthy'
+
+  trigger.on-sync-failed: |
+    - description: Application sync has failed
+      oncePer: app.status.operationState.syncResult.revision
+      send:
+        - app-sync-failed
+      when: app.status.operationState != nil and app.status.operationState.phase in ['Error', 'Failed']
+
+  trigger.on-health-degraded: |
+    - description: Application health has degraded
+      oncePer: app.status.operationState.syncResult.revision
+      send:
+        - app-health-degraded
+      when: app.status.health.status == 'Degraded'
+
+  trigger.on-sync-running: |
+    - description: Application sync is running
+      oncePer: app.status.operationState.syncResult.revision
+      send:
+        - app-sync-running
+      when: app.status.operationState != nil and app.status.operationState.phase in ['Running']
+
+  subscriptions: |
+    - recipients:
+        - telegram:{{ .Values.global.telegram.chatId }}|{{ .Values.global.telegram.topics.deploys }}
+      selector: app.metadata.labels.notifications\.enabled != 'false'
+      triggers:
+        - on-deployed
+    - recipients:
+        - telegram:{{ .Values.global.telegram.chatId }}|{{ .Values.global.telegram.topics.info }}
+      selector: app.metadata.labels.notifications\.enabled != 'false'
+      triggers:
+        - on-sync-running
+    - recipients:
+        - telegram:{{ .Values.global.telegram.chatId }}|{{ .Values.global.telegram.topics.critical }}
+      selector: app.metadata.labels.notifications\.enabled != 'false'
+      triggers:
+        - on-sync-failed
+    - recipients:
+        - telegram:{{ .Values.global.telegram.chatId }}|{{ .Values.global.telegram.topics.warning }}
+      selector: app.metadata.labels.notifications\.enabled != 'false'
+      triggers:
+        - on-health-degraded
