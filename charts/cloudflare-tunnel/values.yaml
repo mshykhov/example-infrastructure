@@ -1,8 +1,13 @@
-replicas: 1
+# Cloudflare Tunnel - Locally Managed
+# All traffic routed to nginx-ingress (catch-all rule)
+
+tunnel:
+  uuid: ""  # Set via global.cloudflare.tunnelId
+
+replicas: 2
 
 image:
   repository: cloudflare/cloudflared
-  # tag defaults to Chart.appVersion
   pullPolicy: IfNotPresent
 
 resources:
