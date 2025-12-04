@@ -87,14 +87,3 @@ services:
     backend:
       name: example-ui-prd
       port: 8080
-
-  uptime-kuma:
-    enabled: true
-    hostname: status.untrustedonline.org
-    namespace: monitoring
-    websocket: true
-    allowedGroups:
-      - infra-admins
-    backend:
-      name: uptime-kuma
-      port: 3001
