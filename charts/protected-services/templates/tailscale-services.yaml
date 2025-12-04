@@ -1,5 +1,5 @@
 {{- range $name, $service := .Values.services }}
-{{- if and $service.enabled (ne $service.tailscale false) }}
+{{- if and $service.enabled (not $service.hostname) }}
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
