@@ -6,6 +6,7 @@
 #   hostname: string    - public domain (enables Cloudflare + External-DNS)
 #   path: string        - ingress path (default: /)
 #   oauth2: bool        - enable OAuth2-Proxy auth (default: true)
+#   websocket: bool     - enable WebSocket support (proxy timeouts 3600s)
 #   allowedGroups: []   - Auth0 groups for access control
 #   backend.name: str   - service name
 #   backend.port: int   - service port
@@ -86,3 +87,14 @@ services:
     backend:
       name: example-ui-prd
       port: 8080
+
+  uptime-kuma:
+    enabled: true
+    hostname: status.untrustedonline.org
+    namespace: monitoring
+    websocket: true
+    allowedGroups:
+      - infra-admins
+    backend:
+      name: uptime-kuma
+      port: 3001

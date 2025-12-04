@@ -28,6 +28,10 @@ metadata:
     {{- if $service.backend.protocol }}
     nginx.ingress.kubernetes.io/backend-protocol: {{ $service.backend.protocol | quote }}
     {{- end }}
+    {{- if $service.websocket }}
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    {{- end }}
 spec:
   ingressClassName: nginx
   rules:
