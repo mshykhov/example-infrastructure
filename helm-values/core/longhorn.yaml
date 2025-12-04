@@ -1,3 +1,11 @@
+# Monitoring
+# https://longhorn.io/docs/1.10.0/monitoring/prometheus-and-grafana-setup/
+metrics:
+  serviceMonitor:
+    enabled: true
+    additionalLabels:
+      release: kube-prometheus-stack
+
 longhornUI:
   replicas: 1
 
