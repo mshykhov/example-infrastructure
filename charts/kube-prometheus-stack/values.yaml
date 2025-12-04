@@ -149,6 +149,8 @@ kube-prometheus-stack:
   kubeProxy:
     enabled: false
   defaultRules:
+    disabled:
+      InfoInhibitor: true
     rules:
       kubeControllerManager: false
       kubeScheduler: false
