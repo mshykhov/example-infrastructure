@@ -12,12 +12,17 @@ extraArgs:
   - --cloudflare-proxied
   - --cloudflare-dns-records-per-page=5000
 
+domainFilters:
+  - untrustedonline.org
+
 sources:
   - ingress
 
 policy: sync
 
 txtOwnerId: external-dns
+
+logLevel: debug
 
 resources:
   requests:
