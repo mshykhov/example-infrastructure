@@ -6,7 +6,6 @@ metadata:
 data:
   service.telegram: |
     token: $telegram-token
-    parseMode: HTML
 
   context: |
     argocdUrl: https://argocd.{{ .Values.global.tailnet }}.ts.net
@@ -27,27 +26,27 @@ data:
       {{`{{- else -}}`}}
         {{`{{- $httpsURL = trimSuffix ".git" $repoURL -}}`}}
       {{`{{- end -}}`}}
-      ✅ <b>{{`{{ .app.metadata.name }}`}}</b>
+      ✅ *{{`{{ .app.metadata.name }}`}}*
 
       📦 Deployed successfully
-      🏷 Namespace: <code>{{`{{ .app.spec.destination.namespace }}`}}</code>
+      🏷 Namespace: `{{`{{ .app.spec.destination.namespace }}`}}`
       {{`{{- if contains "github.com" $repoURL }}`}}
-      🔗 Revision: <a href="{{`{{ $httpsURL }}`}}/commit/{{`{{ $revision }}`}}">{{`{{ $shortRev }}`}}</a>
+      🔗 Revision: [{{`{{ $shortRev }}`}}]({{`{{ $httpsURL }}`}}/commit/{{`{{ $revision }}`}})
       {{`{{- else }}`}}
-      🔗 Revision: <code>{{`{{ $shortRev }}`}}</code>
+      🔗 Revision: `{{`{{ $shortRev }}`}}`
       {{`{{- end }}`}}
       {{`{{- if (call .repo.GetCommitMetadata .app.status.sync.revision).Message }}`}}
       💬 {{`{{ (call .repo.GetCommitMetadata .app.status.sync.revision).Message | trunc 100 }}`}}
       {{`{{- end }}`}}
 
-      🔗 <a href="{{`{{ .context.argocdUrl }}`}}/applications/{{`{{ .app.metadata.name }}`}}">Open in ArgoCD</a>
+      🔗 [Open in ArgoCD]({{`{{ .context.argocdUrl }}`}}/applications/{{`{{ .app.metadata.name }}`}})
 
   template.app-sync-failed: |
     message: |
-      ❌ <b>{{`{{ .app.metadata.name }}`}}</b>
+      ❌ *{{`{{ .app.metadata.name }}`}}*
 
       🚫 Sync failed
-      🏷 Namespace: <code>{{`{{ .app.spec.destination.namespace }}`}}</code>
+      🏷 Namespace: `{{`{{ .app.spec.destination.namespace }}`}}`
       {{`{{- if .app.status.operationState.message }}`}}
       ⚠️ Error: {{`{{ .app.status.operationState.message | trunc 200 }}`}}
       {{`{{- end }}`}}
@@ -55,36 +54,36 @@ data:
       • {{`{{ $c.type }}`}}: {{`{{ $c.message | trunc 100 }}`}}
       {{`{{- end }}`}}
 
-      🔗 <a href="{{`{{ .context.argocdUrl }}`}}/applications/{{`{{ .app.metadata.name }}`}}?operation=true">View Details</a>
+      🔗 [View Details]({{`{{ .context.argocdUrl }}`}}/applications/{{`{{ .app.metadata.name }}`}}?operation=true)
 
   template.app-health-degraded: |
     message: |
-      ⚠️ <b>{{`{{ .app.metadata.name }}`}}</b>
+      ⚠️ *{{`{{ .app.metadata.name }}`}}*
 
       💔 Health degraded
-      🏷 Namespace: <code>{{`{{ .app.spec.destination.namespace }}`}}</code>
-      📊 Status: <code>{{`{{ .app.status.health.status }}`}}</code>
+      🏷 Namespace: `{{`{{ .app.spec.destination.namespace }}`}}`
+      📊 Status: `{{`{{ .app.status.health.status }}`}}`
       {{`{{- range $c := .app.status.conditions }}`}}
       • {{`{{ $c.type }}`}}: {{`{{ $c.message | trunc 100 }}`}}
       {{`{{- end }}`}}
 
-      🔗 <a href="{{`{{ .context.argocdUrl }}`}}/applications/{{`{{ .app.metadata.name }}`}}">Open in ArgoCD</a>
+      🔗 [Open in ArgoCD]({{`{{ .context.argocdUrl }}`}}/applications/{{`{{ .app.metadata.name }}`}})
 
   template.app-sync-running: |
     message: |
-      🔄 <b>{{`{{ .app.metadata.name }}`}}</b>
+      🔄 *{{`{{ .app.metadata.name }}`}}*
 
       ⏳ Sync in progress
-      🏷 Namespace: <code>{{`{{ .app.spec.destination.namespace }}`}}</code>
-      🔗 Revision: <code>{{`{{ .app.status.sync.revision | trunc 7 }}`}}</code>
+      🏷 Namespace: `{{`{{ .app.spec.destination.namespace }}`}}`
+      🔗 Revision: `{{`{{ .app.status.sync.revision | trunc 7 }}`}}`
 
   template.app-sync-succeeded: |
     message: |
-      ✓ <b>{{`{{ .app.metadata.name }}`}}</b>
+      ✓ *{{`{{ .app.metadata.name }}`}}*
 
       🔄 Sync completed
-      🏷 Namespace: <code>{{`{{ .app.spec.destination.namespace }}`}}</code>
-      🔗 Revision: <code>{{`{{ .app.status.sync.revision | trunc 7 }}`}}</code>
+      🏷 Namespace: `{{`{{ .app.spec.destination.namespace }}`}}`
+      🔗 Revision: `{{`{{ .app.status.sync.revision | trunc 7 }}`}}`
 
   trigger.on-deployed: |
     - description: Application is synced and healthy
