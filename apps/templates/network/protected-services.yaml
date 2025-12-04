@@ -26,6 +26,8 @@ spec:
           auth0:
             domain: {{ .Values.global.auth0.domain }}
             clientId: {{ .Values.global.auth0.clientId }}
+          cloudflare:
+            tunnelId: {{ .Values.global.cloudflare.tunnelId }}
   destination:
     server: {{ .Values.spec.destination.server }}
     namespace: default

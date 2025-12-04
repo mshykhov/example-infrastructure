@@ -1,18 +1,12 @@
 # =============================================================================
-# CLOUDFLARE TUNNEL
+# CLOUDFLARE TUNNEL (locally-managed)
 # =============================================================================
 # Docs: https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/
 #
-# Provides:
-# - Public access to PRD services via Cloudflare Edge
-# - DDoS protection, WAF, TLS termination
-# - Outbound-only connection (no firewall holes needed)
+# All traffic routed to nginx-ingress via catch-all rule.
+# DNS records created automatically by External-DNS.
 #
-# Prerequisites:
-# - Cloudflare account with domain
-# - Tunnel created in Zero Trust Dashboard
-# - Doppler secret: CF_TUNNEL_TOKEN
-# - Public hostnames configured in Cloudflare Dashboard
+# Doppler secrets: CF_TUNNEL_CREDENTIALS
 # =============================================================================
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -29,6 +23,10 @@ spec:
     repoURL: {{ .Values.spec.source.repoURL }}
     targetRevision: {{ .Values.spec.source.targetRevision }}
     path: charts/cloudflare-tunnel
+    helm:
+      valuesObject:
+        tunnel:
+          uuid: {{ .Values.global.cloudflare.tunnelId }}
   destination:
     server: {{ .Values.spec.destination.server }}
     namespace: cloudflare

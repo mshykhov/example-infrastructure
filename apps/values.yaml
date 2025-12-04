@@ -37,4 +37,8 @@ global:
   dockerhub:
     username: shykhovmyron
 
+  # Cloudflare Tunnel
+  cloudflare:
+    tunnelId: f6746974-5104-49ef-beed-c66a048f5062
+
 
