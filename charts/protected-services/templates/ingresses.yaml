@@ -6,8 +6,13 @@ kind: Ingress
 metadata:
   name: {{ $name }}
   namespace: {{ $service.namespace }}
-  {{- if ne $service.oauth2 false }}
   annotations:
+    {{- if $service.hostname }}
+    external-dns.alpha.kubernetes.io/hostname: {{ $service.hostname }}
+    external-dns.alpha.kubernetes.io/target: {{ $.Values.global.cloudflare.tunnelId }}.cfargotunnel.com
+    external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+    {{- end }}
+    {{- if ne $service.oauth2 false }}
     {{- $authUrl := $.Values.oauth2Proxy.authUrl }}
     {{- if $service.allowedGroups }}
     {{- $authUrl = printf "%s?allowed_groups=%s" $.Values.oauth2Proxy.authUrl (join "," $service.allowedGroups) }}
@@ -15,21 +20,21 @@ metadata:
     nginx.ingress.kubernetes.io/auth-url: {{ $authUrl | quote }}
     nginx.ingress.kubernetes.io/auth-signin: {{ $.Values.oauth2Proxy.authSignin | quote }}
     nginx.ingress.kubernetes.io/auth-response-headers: {{ $.Values.oauth2Proxy.authResponseHeaders | quote }}
-    {{- if $service.backend.protocol }}
-    nginx.ingress.kubernetes.io/backend-protocol: {{ $service.backend.protocol | quote }}
-    {{- end }}
     nginx.ingress.kubernetes.io/server-snippet: |
       location = /logout {
         return 302 /oauth2/sign_out?rd=https%3A%2F%2F{{ $.Values.global.auth0.domain }}%2Fv2%2Flogout%3Fclient_id%3D{{ $.Values.global.auth0.clientId }}%26returnTo%3Dhttps%253A%252F%252F$host;
       }
-  {{- end }}
+    {{- end }}
+    {{- if $service.backend.protocol }}
+    nginx.ingress.kubernetes.io/backend-protocol: {{ $service.backend.protocol | quote }}
+    {{- end }}
 spec:
   ingressClassName: nginx
   rules:
-    - host: {{ if $service.cloudflareHost }}{{ $service.cloudflareHost }}{{ else }}{{ $name }}.{{ $.Values.global.tailnet }}.ts.net{{ end }}
+    - host: {{ if $service.hostname }}{{ $service.hostname }}{{ else }}{{ $name }}.{{ $.Values.global.tailnet }}.ts.net{{ end }}
       http:
         paths:
-          - path: /
+          - path: {{ $service.path | default "/" }}
             pathType: Prefix
             backend:
               service:

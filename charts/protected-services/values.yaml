@@ -1,19 +1,27 @@
-# =============================================================================
-# PROTECTED SERVICES CONFIGURATION
-# =============================================================================
-# Dynamic values come from global (passed via Application valuesObject)
+# Protected Services - Ingress Configuration
+#
+# Service parameters:
+#   enabled: bool       - enable/disable ingress
+#   namespace: string   - target namespace
+#   hostname: string    - public domain (enables Cloudflare + External-DNS)
+#   path: string        - ingress path (default: /)
+#   oauth2: bool        - enable OAuth2-Proxy auth (default: true)
+#   allowedGroups: []   - Auth0 groups for access control
+#   backend.name: str   - service name
+#   backend.port: int   - service port
+#   backend.protocol: str - backend protocol (optional, e.g. HTTPS)
+#
+# Routing:
+#   - With hostname: public via Cloudflare Tunnel
+#   - Without hostname: private via Tailscale (name.tailnet.ts.net)
 
-# =============================================================================
-# OAuth2-Proxy Integration (deployed separately via helm chart)
-# =============================================================================
+# cloudflare.tunnelId comes from global values
+
 oauth2Proxy:
   authUrl: "http://oauth2-proxy.oauth2-proxy.svc.cluster.local/oauth2/auth"
   authSignin: "https://$host/oauth2/start?rd=$escaped_request_uri"
   authResponseHeaders: "X-Auth-Request-User,X-Auth-Request-Email,X-Auth-Request-Groups"
 
-# =============================================================================
-# Services to protect via Tailscale + NGINX Ingress + OAuth2-Proxy
-# =============================================================================
 services:
   argocd:
     enabled: true
@@ -45,9 +53,6 @@ services:
       name: kube-prometheus-stack-grafana
       port: 80
 
-  # =============================================================================
-  # DEV Services (Tailscale only, oauth2: false disables OAuth2-Proxy)
-  # =============================================================================
   example-api-dev:
     enabled: true
     oauth2: false
@@ -64,15 +69,10 @@ services:
       name: example-ui-dev
       port: 8080
 
-  # =============================================================================
-  # PRD Services - Public via Cloudflare Tunnel + NGINX Ingress
-  # =============================================================================
   example-api-prd:
     enabled: true
     oauth2: false
-    tailscale: false
-    cloudflare: true
-    cloudflareHost: "api.untrustedonline.org"
+    hostname: api.untrustedonline.org
     namespace: example-api-prd
     backend:
       name: example-api-prd
@@ -81,9 +81,7 @@ services:
   example-ui-prd:
     enabled: true
     oauth2: false
-    tailscale: false
-    cloudflare: true
-    cloudflareHost: "untrustedonline.org"
+    hostname: untrustedonline.org
     namespace: example-ui-prd
     backend:
       name: example-ui-prd
