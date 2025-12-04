@@ -1,8 +1,7 @@
 # =============================================================================
 # KUBE-PROMETHEUS-STACK
 # =============================================================================
-# Docs: https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
-#
+# Wrapper chart with templated Alertmanager config
 # Includes: Prometheus, Grafana, AlertManager, Node Exporter, kube-state-metrics
 # =============================================================================
 apiVersion: argoproj.io/v1alpha1
@@ -16,17 +15,21 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
-  sources:
-    - repoURL: https://prometheus-community.github.io/helm-charts
-      chart: kube-prometheus-stack
-      targetRevision: "79.10.0"
-      helm:
-        skipCrds: false
-        valueFiles:
-          - $values/helm-values/monitoring/kube-prometheus-stack.yaml
-    - repoURL: {{ .Values.spec.source.repoURL }}
-      targetRevision: {{ .Values.spec.source.targetRevision }}
-      ref: values
+  source:
+    repoURL: {{ .Values.spec.source.repoURL }}
+    targetRevision: {{ .Values.spec.source.targetRevision }}
+    path: charts/kube-prometheus-stack
+    helm:
+      skipCrds: false
+      valuesObject:
+        global:
+          telegram:
+            chatId: {{ .Values.global.telegram.chatId | quote }}
+            topics:
+              critical: {{ .Values.global.telegram.topics.critical | quote }}
+              warning: {{ .Values.global.telegram.topics.warning | quote }}
+              info: {{ .Values.global.telegram.topics.info | quote }}
+              deploys: {{ .Values.global.telegram.topics.deploys | quote }}
   destination:
     server: {{ .Values.spec.destination.server }}
     namespace: monitoring
