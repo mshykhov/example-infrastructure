@@ -179,13 +179,21 @@ alertmanager:
             message_thread_id: 2
             parse_mode: 'HTML'
             send_resolved: true
-            message: |
-              {{ if eq .Status "firing" }}🔴 <b>CRITICAL</b>{{ else }}✅ <b>RESOLVED</b>{{ end }}
-              <b>Alert:</b> {{ .CommonLabels.alertname }}
-              <b>Namespace:</b> {{ .CommonLabels.namespace }}
-              {{ range .Alerts }}
-              {{ .Annotations.summary }}
-              {{ end }}
+            message: '{{ if eq .Status "firing" }}🔴 <b>CRITICAL</b>{{ else }}✅ <b>RESOLVED</b>{{ end }} │ <b>{{ .CommonLabels.alertname }}</b>{{ range .Alerts }}
+
+{{ if .Annotations.summary }}📋 {{ .Annotations.summary }}{{ end }}{{ if .Annotations.description }}
+📝 {{ .Annotations.description }}{{ end }}
+
+<b>Where:</b>{{ if .Labels.namespace }} <code>{{ .Labels.namespace }}</code>{{ end }}{{ if .Labels.pod }} → <code>{{ .Labels.pod }}</code>{{ end }}{{ if .Labels.container }} ({{ .Labels.container }}){{ end }}{{ if .Labels.node }}
+Node: <code>{{ .Labels.node }}</code>{{ end }}{{ if .Labels.service }}
+Service: <code>{{ .Labels.service }}</code>{{ end }}{{ if .Labels.instance }}
+Instance: <code>{{ .Labels.instance }}</code>{{ end }}
+
+<b>When:</b> {{ .StartsAt.Format "02 Jan 15:04" }}{{ if eq $.Status "resolved" }} → {{ .EndsAt.Format "15:04" }}{{ end }}{{ if .Annotations.runbook_url }}
+📖 <a href="{{ .Annotations.runbook_url }}">Runbook</a>{{ end }}{{ if .GeneratorURL }} │ 🔗 <a href="{{ .GeneratorURL }}">Query</a>{{ end }}{{ end }}
+
+─────────────────
+🔥 {{ .Alerts.Firing | len }} firing │ ✅ {{ .Alerts.Resolved | len }} resolved'
 
       - name: 'telegram-warning'
         telegram_configs:
@@ -194,13 +202,21 @@ alertmanager:
             message_thread_id: 5
             parse_mode: 'HTML'
             send_resolved: true
-            message: |
-              {{ if eq .Status "firing" }}🟠 <b>WARNING</b>{{ else }}✅ <b>RESOLVED</b>{{ end }}
-              <b>Alert:</b> {{ .CommonLabels.alertname }}
-              <b>Namespace:</b> {{ .CommonLabels.namespace }}
-              {{ range .Alerts }}
-              {{ .Annotations.summary }}
-              {{ end }}
+            message: '{{ if eq .Status "firing" }}🟠 <b>WARNING</b>{{ else }}✅ <b>RESOLVED</b>{{ end }} │ <b>{{ .CommonLabels.alertname }}</b>{{ range .Alerts }}
+
+{{ if .Annotations.summary }}📋 {{ .Annotations.summary }}{{ end }}{{ if .Annotations.description }}
+📝 {{ .Annotations.description }}{{ end }}
+
+<b>Where:</b>{{ if .Labels.namespace }} <code>{{ .Labels.namespace }}</code>{{ end }}{{ if .Labels.pod }} → <code>{{ .Labels.pod }}</code>{{ end }}{{ if .Labels.container }} ({{ .Labels.container }}){{ end }}{{ if .Labels.node }}
+Node: <code>{{ .Labels.node }}</code>{{ end }}{{ if .Labels.service }}
+Service: <code>{{ .Labels.service }}</code>{{ end }}{{ if .Labels.instance }}
+Instance: <code>{{ .Labels.instance }}</code>{{ end }}
+
+<b>When:</b> {{ .StartsAt.Format "02 Jan 15:04" }}{{ if eq $.Status "resolved" }} → {{ .EndsAt.Format "15:04" }}{{ end }}{{ if .Annotations.runbook_url }}
+📖 <a href="{{ .Annotations.runbook_url }}">Runbook</a>{{ end }}{{ end }}
+
+─────────────────
+⚠️ {{ .Alerts.Firing | len }} firing │ ✅ {{ .Alerts.Resolved | len }} resolved'
 
       - name: 'telegram-info'
         telegram_configs:
@@ -209,12 +225,11 @@ alertmanager:
             message_thread_id: 7
             parse_mode: 'HTML'
             send_resolved: false
-            message: |
-              ⚪ <b>INFO</b>
-              <b>Alert:</b> {{ .CommonLabels.alertname }}
-              {{ range .Alerts }}
-              {{ .Annotations.summary }}
-              {{ end }}
+            message: '⚪ <b>INFO</b> │ <b>{{ .CommonLabels.alertname }}</b>{{ range .Alerts }}
+
+{{ if .Annotations.summary }}{{ .Annotations.summary }}{{ end }}{{ if .Annotations.description }}
+{{ .Annotations.description }}{{ end }}{{ if .Labels.namespace }}
+📍 <code>{{ .Labels.namespace }}</code>{{ end }}{{ end }}'
 
 # =============================================================================
 # NODE EXPORTER
@@ -257,3 +272,23 @@ prometheusOperator:
     limits:
       cpu: 500m
       memory: 512Mi
+
+# =============================================================================
+# K3S SPECIFIC - DISABLE FALSE POSITIVE ALERTS
+# =============================================================================
+# k3s bundles controller-manager, scheduler, proxy into single binary
+# These components don't expose separate metrics endpoints
+kubeControllerManager:
+  enabled: false
+
+kubeScheduler:
+  enabled: false
+
+kubeProxy:
+  enabled: false
+
+defaultRules:
+  rules:
+    kubeControllerManager: false
+    kubeScheduler: false
+    kubeProxy: false
