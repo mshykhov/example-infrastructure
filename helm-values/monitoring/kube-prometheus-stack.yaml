@@ -104,6 +104,11 @@ alertmanager:
   enabled: true
 
   alertmanagerSpec:
+    # Mount Telegram secrets
+    # https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack#alertmanager
+    secrets:
+      - telegram-secrets
+
     storage:
       volumeClaimTemplate:
         spec:
@@ -123,6 +128,93 @@ alertmanager:
 
   ingress:
     enabled: false
+
+  # Alertmanager configuration
+  # https://prometheus.io/docs/alerting/latest/configuration/
+  config:
+    global:
+      resolve_timeout: 5m
+
+    # Routing tree
+    route:
+      receiver: 'telegram-info'
+      group_by: ['alertname', 'namespace']
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 12h
+      routes:
+        # Critical alerts → Critical topic
+        - receiver: 'telegram-critical'
+          matchers:
+            - severity = critical
+          continue: false
+
+        # Warning alerts → Warning topic
+        - receiver: 'telegram-warning'
+          matchers:
+            - severity = warning
+          continue: false
+
+        # Watchdog and info → Info topic
+        - receiver: 'telegram-info'
+          matchers:
+            - alertname = Watchdog
+          repeat_interval: 24h
+          continue: false
+
+    # Inhibit rules - critical suppresses warning for same alertname
+    inhibit_rules:
+      - source_matchers:
+          - severity = critical
+        target_matchers:
+          - severity = warning
+        equal: ['alertname', 'namespace']
+
+    # Receivers
+    receivers:
+      - name: 'telegram-critical'
+        telegram_configs:
+          - bot_token_file: /etc/alertmanager/secrets/telegram-secrets/bot-token
+            chat_id: -1003078665133
+            message_thread_id: 2
+            parse_mode: 'HTML'
+            send_resolved: true
+            message: |
+              {{ if eq .Status "firing" }}🔴 <b>CRITICAL</b>{{ else }}✅ <b>RESOLVED</b>{{ end }}
+              <b>Alert:</b> {{ .CommonLabels.alertname }}
+              <b>Namespace:</b> {{ .CommonLabels.namespace }}
+              {{ range .Alerts }}
+              {{ .Annotations.summary }}
+              {{ end }}
+
+      - name: 'telegram-warning'
+        telegram_configs:
+          - bot_token_file: /etc/alertmanager/secrets/telegram-secrets/bot-token
+            chat_id: -1003078665133
+            message_thread_id: 5
+            parse_mode: 'HTML'
+            send_resolved: true
+            message: |
+              {{ if eq .Status "firing" }}🟠 <b>WARNING</b>{{ else }}✅ <b>RESOLVED</b>{{ end }}
+              <b>Alert:</b> {{ .CommonLabels.alertname }}
+              <b>Namespace:</b> {{ .CommonLabels.namespace }}
+              {{ range .Alerts }}
+              {{ .Annotations.summary }}
+              {{ end }}
+
+      - name: 'telegram-info'
+        telegram_configs:
+          - bot_token_file: /etc/alertmanager/secrets/telegram-secrets/bot-token
+            chat_id: -1003078665133
+            message_thread_id: 7
+            parse_mode: 'HTML'
+            send_resolved: false
+            message: |
+              ⚪ <b>INFO</b>
+              <b>Alert:</b> {{ .CommonLabels.alertname }}
+              {{ range .Alerts }}
+              {{ .Annotations.summary }}
+              {{ end }}
 
 # =============================================================================
 # NODE EXPORTER
