@@ -37,8 +37,8 @@ spec:
               cookie_httponly = true
               cookie_csrf_per_request = true
               cookie_csrf_expire = "5m"
-              whitelist_domains = [".{{ .Values.global.tailnet }}.ts.net", ".auth0.com"]
-              cookie_domains = [".{{ .Values.global.tailnet }}.ts.net"]
+              whitelist_domains = [".{{ .Values.global.tailnet }}.ts.net", ".untrustedonline.org", ".auth0.com"]
+              cookie_domains = [".{{ .Values.global.tailnet }}.ts.net", ".untrustedonline.org"]
               insecure_oidc_allow_unverified_email = true
               oidc_groups_claim = "https://ns/groups"
     # Values from git repo
