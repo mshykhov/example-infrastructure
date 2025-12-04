@@ -96,6 +96,12 @@ spec:
           kind: Secret
           jsonPointers:
             - /data/password
+        - group: external-secrets.io
+          kind: ExternalSecret
+          jqPathExpressions:
+            - .spec.data[].remoteRef.conversionStrategy
+            - .spec.data[].remoteRef.decodingStrategy
+            - .spec.data[].remoteRef.metadataPolicy
       syncPolicy:
         automated:
           prune: true
