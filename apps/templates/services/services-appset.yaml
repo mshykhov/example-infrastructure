@@ -47,6 +47,7 @@ spec:
       labels:
         app: '{{`{{ .path.basename }}`}}'
         env: '{{`{{ .env }}`}}'
+        deploy-notify: "true"
     spec:
       project: default
       source:

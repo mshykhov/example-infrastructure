@@ -112,23 +112,24 @@ data:
       when: app.status.operationState != nil and app.status.operationState.phase in ['Running']
 
   subscriptions: |
+    # Deploy notifications - only for apps with deploy-notify=true label
     - recipients:
         - telegram:{{ .Values.global.telegram.chatId }}|{{ .Values.global.telegram.topics.deploys }}
-      selector: app.metadata.labels.notifications\.enabled != 'false'
+      selector: deploy-notify=true
       triggers:
         - on-deployed
+    # Info notifications - all apps
     - recipients:
         - telegram:{{ .Values.global.telegram.chatId }}|{{ .Values.global.telegram.topics.info }}
-      selector: app.metadata.labels.notifications\.enabled != 'false'
       triggers:
         - on-sync-running
+    # Critical notifications - all apps
     - recipients:
         - telegram:{{ .Values.global.telegram.chatId }}|{{ .Values.global.telegram.topics.critical }}
-      selector: app.metadata.labels.notifications\.enabled != 'false'
       triggers:
         - on-sync-failed
+    # Warning notifications - all apps
     - recipients:
         - telegram:{{ .Values.global.telegram.chatId }}|{{ .Values.global.telegram.topics.warning }}
-      selector: app.metadata.labels.notifications\.enabled != 'false'
       triggers:
         - on-health-degraded
