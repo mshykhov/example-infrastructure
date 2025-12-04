@@ -69,13 +69,34 @@ data:
 
       🔗 [Open in ArgoCD]({{`{{ .context.argocdUrl }}`}}/applications/{{`{{ .app.metadata.name }}`}})
 
-  template.app-sync-succeeded: |
+  template.app-sync-status-unknown: |
     message: |
-      ✓ *{{`{{ .app.metadata.name }}`}}*
+      ❓ *{{`{{ .app.metadata.name }}`}}*
 
-      🔄 Sync completed
+      🔍 Sync status unknown
       🏷 Namespace: `{{`{{ .app.spec.destination.namespace }}`}}`
-      🔗 Revision: `{{`{{ .app.status.sync.revision | trunc 7 }}`}}`
+      {{`{{- range $c := .app.status.conditions }}`}}
+      • {{`{{ $c.type }}`}}: {{`{{ $c.message | trunc 100 }}`}}
+      {{`{{- end }}`}}
+
+      🔗 [Open in ArgoCD]({{`{{ .context.argocdUrl }}`}}/applications/{{`{{ .app.metadata.name }}`}})
+
+  template.app-created: |
+    message: |
+      🆕 *{{`{{ .app.metadata.name }}`}}*
+
+      📝 Application created
+      🏷 Namespace: `{{`{{ .app.spec.destination.namespace }}`}}`
+      📂 Project: `{{`{{ .app.spec.project }}`}}`
+
+      🔗 [Open in ArgoCD]({{`{{ .context.argocdUrl }}`}}/applications/{{`{{ .app.metadata.name }}`}})
+
+  template.app-deleted: |
+    message: |
+      🗑 *{{`{{ .app.metadata.name }}`}}*
+
+      ❌ Application deleted
+      🏷 Namespace: `{{`{{ .app.spec.destination.namespace }}`}}`
 
   trigger.on-deployed: |
     - description: Application is synced and healthy
@@ -98,6 +119,24 @@ data:
         - app-health-degraded
       when: app.status.health.status == 'Degraded'
 
+  trigger.on-sync-status-unknown: |
+    - description: Application sync status is unknown
+      send:
+        - app-sync-status-unknown
+      when: app.status.sync.status == 'Unknown'
+
+  trigger.on-created: |
+    - description: Application is created
+      send:
+        - app-created
+      when: "true"
+
+  trigger.on-deleted: |
+    - description: Application is deleted
+      send:
+        - app-deleted
+      when: app.metadata.deletionTimestamp != nil
+
   subscriptions: |
     # Deploy notifications - only for apps with deploy-notify=true label
     - recipients:
@@ -115,3 +154,10 @@ data:
         - telegram:{{ .Values.global.telegram.chatId }}|{{ .Values.global.telegram.topics.warning }}
       triggers:
         - on-health-degraded
+        - on-sync-status-unknown
+    # Info notifications - all apps (audit)
+    - recipients:
+        - telegram:{{ .Values.global.telegram.chatId }}|{{ .Values.global.telegram.topics.info }}
+      triggers:
+        - on-created
+        - on-deleted
