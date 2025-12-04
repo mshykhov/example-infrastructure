@@ -41,4 +41,13 @@ global:
   cloudflare:
     tunnelId: f6746974-5104-49ef-beed-c66a048f5062
 
+  # Telegram Notifications
+  telegram:
+    chatId: "-1003078665133"
+    topics:
+      critical: "2"
+      warning: "5"
+      info: "7"
+      deploys: "10"
+
 
