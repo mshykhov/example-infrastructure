@@ -6,6 +6,7 @@ metadata:
 data:
   service.telegram: |
     token: $telegram-token
+    parseMode: HTML
 
   context: |
     argocdUrl: https://argocd.{{ .Values.global.tailnet }}.ts.net
