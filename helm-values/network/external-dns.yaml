@@ -11,6 +11,7 @@ env:
 extraArgs:
   - --cloudflare-proxied
   - --cloudflare-dns-records-per-page=5000
+  - --txt-prefix=extdns-
 
 domainFilters:
   - untrustedonline.org
