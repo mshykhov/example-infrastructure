@@ -1,0 +1,93 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: alertmanager-config
+  namespace: monitoring
+  labels:
+    app: kube-prometheus-stack
+stringData:
+  alertmanager.yaml: |
+    global:
+      resolve_timeout: 5m
+
+    route:
+      receiver: 'telegram-info'
+      group_by: ['alertname', 'namespace']
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 12h
+      routes:
+        - receiver: 'telegram-critical'
+          matchers:
+            - severity = critical
+          continue: false
+        - receiver: 'telegram-warning'
+          matchers:
+            - severity = warning
+          continue: false
+        - receiver: 'telegram-info'
+          matchers:
+            - alertname = Watchdog
+          repeat_interval: 24h
+          continue: false
+
+    inhibit_rules:
+      - source_matchers:
+          - severity = critical
+        target_matchers:
+          - severity = warning
+        equal: ['alertname', 'namespace']
+
+    receivers:
+      - name: 'telegram-critical'
+        telegram_configs:
+          - bot_token_file: /etc/alertmanager/secrets/telegram-secrets/bot-token
+            chat_id: {{ .Values.global.telegram.chatId }}
+            message_thread_id: {{ .Values.global.telegram.topics.critical }}
+            parse_mode: 'HTML'
+            send_resolved: true
+            message: |
+              {{`{{ if eq .Status "firing" }}`}}🔴{{`{{ else }}`}}✅{{`{{ end }}`}} <b>{{`{{ .CommonLabels.alertname }}`}}</b>
+              {{`{{ range $i, $a := .Alerts }}{{ if $i }}`}}
+              ───{{`{{ end }}`}}
+              {{`{{ if $a.Annotations.summary }}{{ $a.Annotations.summary }}{{ end }}`}}
+              {{`{{ if $a.Annotations.description }}{{ $a.Annotations.description }}{{ end }}`}}
+              {{`{{ if or $a.Labels.namespace $a.Labels.node $a.Labels.instance }}`}}📍 {{`{{ if $a.Labels.node }}{{ $a.Labels.node }}{{ else if $a.Labels.namespace }}{{ $a.Labels.namespace }}{{ if $a.Labels.pod }}/{{ $a.Labels.pod }}{{ if $a.Labels.container }}:{{ $a.Labels.container }}{{ end }}{{ end }}{{ else if $a.Labels.instance }}{{ $a.Labels.instance }}{{ end }}{{ end }}`}}
+              ⏱ {{`{{ $a.StartsAt.Format "02 Jan 15:04" }}{{ if eq $a.Status "resolved" }}`}} → {{`{{ $a.EndsAt.Format "15:04" }}{{ end }}{{ if $a.Annotations.runbook_url }}`}}
+              📖 <a href="{{`{{ $a.Annotations.runbook_url }}`}}">Runbook</a>{{`{{ end }}{{ end }}`}}
+              {{`{{ if gt (len .Alerts) 1 }}`}}
+              ━━━
+              Total: {{`{{ .Alerts.Firing | len }}`}} 🔥 {{`{{ .Alerts.Resolved | len }}`}} ✅{{`{{ end }}`}}
+
+      - name: 'telegram-warning'
+        telegram_configs:
+          - bot_token_file: /etc/alertmanager/secrets/telegram-secrets/bot-token
+            chat_id: {{ .Values.global.telegram.chatId }}
+            message_thread_id: {{ .Values.global.telegram.topics.warning }}
+            parse_mode: 'HTML'
+            send_resolved: true
+            message: |
+              {{`{{ if eq .Status "firing" }}`}}🟠{{`{{ else }}`}}✅{{`{{ end }}`}} <b>{{`{{ .CommonLabels.alertname }}`}}</b>
+              {{`{{ range $i, $a := .Alerts }}{{ if $i }}`}}
+              ───{{`{{ end }}`}}
+              {{`{{ if $a.Annotations.summary }}{{ $a.Annotations.summary }}{{ end }}`}}
+              {{`{{ if $a.Annotations.description }}{{ $a.Annotations.description }}{{ end }}`}}
+              {{`{{ if or $a.Labels.namespace $a.Labels.node $a.Labels.instance }}`}}📍 {{`{{ if $a.Labels.node }}{{ $a.Labels.node }}{{ else if $a.Labels.namespace }}{{ $a.Labels.namespace }}{{ if $a.Labels.pod }}/{{ $a.Labels.pod }}{{ if $a.Labels.container }}:{{ $a.Labels.container }}{{ end }}{{ end }}{{ else if $a.Labels.instance }}{{ $a.Labels.instance }}{{ end }}{{ end }}`}}
+              ⏱ {{`{{ $a.StartsAt.Format "02 Jan 15:04" }}{{ if eq $a.Status "resolved" }}`}} → {{`{{ $a.EndsAt.Format "15:04" }}{{ end }}{{ if $a.Annotations.runbook_url }}`}}
+              📖 <a href="{{`{{ $a.Annotations.runbook_url }}`}}">Runbook</a>{{`{{ end }}{{ end }}`}}
+              {{`{{ if gt (len .Alerts) 1 }}`}}
+              ━━━
+              Total: {{`{{ .Alerts.Firing | len }}`}} ⚠️ {{`{{ .Alerts.Resolved | len }}`}} ✅{{`{{ end }}`}}
+
+      - name: 'telegram-info'
+        telegram_configs:
+          - bot_token_file: /etc/alertmanager/secrets/telegram-secrets/bot-token
+            chat_id: {{ .Values.global.telegram.chatId }}
+            message_thread_id: {{ .Values.global.telegram.topics.info }}
+            parse_mode: 'HTML'
+            send_resolved: false
+            message: |
+              ℹ️ <b>{{`{{ .CommonLabels.alertname }}`}}</b>
+              {{`{{ range .Alerts }}`}}
+              {{`{{ if .Annotations.summary }}{{ .Annotations.summary }}{{ else }}{{ .Annotations.description }}{{ end }}{{ if .Labels.namespace }}`}}
+              📍 {{`{{ .Labels.namespace }}{{ end }}{{ end }}`}}

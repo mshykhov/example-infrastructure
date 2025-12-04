@@ -1,0 +1,155 @@
+# =============================================================================
+# KUBE-PROMETHEUS-STACK WRAPPER VALUES
+# =============================================================================
+# Telegram config comes from global values and is templated in alertmanager-config.yaml
+
+kube-prometheus-stack:
+  # ===========================================================================
+  # GRAFANA
+  # ===========================================================================
+  grafana:
+    enabled: true
+    adminPassword: "admin"
+    grafana.ini:
+      auth.anonymous:
+        enabled: true
+        org_name: Main Org.
+        org_role: Admin
+      auth:
+        disable_login_form: true
+      server:
+        root_url: "%(protocol)s://%(domain)s/"
+    ingress:
+      enabled: false
+    persistence:
+      enabled: true
+      storageClassName: longhorn
+      size: 5Gi
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+    defaultDashboardsEnabled: true
+    defaultDashboardsTimezone: utc
+    additionalDataSources:
+      - name: Loki
+        type: loki
+        url: http://loki.monitoring.svc.cluster.local:3100
+        access: proxy
+        isDefault: false
+
+  # ===========================================================================
+  # PROMETHEUS
+  # ===========================================================================
+  prometheus:
+    enabled: true
+    prometheusSpec:
+      retention: 15d
+      retentionSize: "10GB"
+      storageSpec:
+        volumeClaimTemplate:
+          spec:
+            storageClassName: longhorn
+            accessModes: ["ReadWriteOnce"]
+            resources:
+              requests:
+                storage: 20Gi
+      resources:
+        requests:
+          cpu: 200m
+          memory: 512Mi
+        limits:
+          cpu: 1000m
+          memory: 2Gi
+      serviceMonitorSelectorNilUsesHelmValues: false
+      podMonitorSelectorNilUsesHelmValues: false
+    ingress:
+      enabled: false
+
+  # ===========================================================================
+  # ALERTMANAGER
+  # ===========================================================================
+  alertmanager:
+    enabled: true
+    alertmanagerSpec:
+      secrets:
+        - telegram-secrets
+      useExistingSecret: true
+      configSecret: alertmanager-config
+      storage:
+        volumeClaimTemplate:
+          spec:
+            storageClassName: longhorn
+            accessModes: ["ReadWriteOnce"]
+            resources:
+              requests:
+                storage: 2Gi
+      resources:
+        requests:
+          cpu: 50m
+          memory: 64Mi
+        limits:
+          cpu: 200m
+          memory: 256Mi
+    ingress:
+      enabled: false
+
+  # ===========================================================================
+  # NODE EXPORTER
+  # ===========================================================================
+  nodeExporter:
+    enabled: true
+
+  prometheus-node-exporter:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 32Mi
+      limits:
+        cpu: 200m
+        memory: 64Mi
+
+  # ===========================================================================
+  # KUBE-STATE-METRICS
+  # ===========================================================================
+  kubeStateMetrics:
+    enabled: true
+
+  kube-state-metrics:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi
+
+  # ===========================================================================
+  # PROMETHEUS OPERATOR
+  # ===========================================================================
+  prometheusOperator:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+
+  # ===========================================================================
+  # K3S SPECIFIC
+  # ===========================================================================
+  kubeControllerManager:
+    enabled: false
+  kubeScheduler:
+    enabled: false
+  kubeProxy:
+    enabled: false
+  defaultRules:
+    rules:
+      kubeControllerManager: false
+      kubeScheduler: false
+      kubeProxy: false
