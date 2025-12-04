@@ -28,6 +28,13 @@ spec:
           auth0:
             domain: {{ .Values.global.auth0.domain }}
             clientId: {{ .Values.global.auth0.clientId }}
+          telegram:
+            chatId: {{ .Values.global.telegram.chatId | quote }}
+            topics:
+              critical: {{ .Values.global.telegram.topics.critical | quote }}
+              warning: {{ .Values.global.telegram.topics.warning | quote }}
+              info: {{ .Values.global.telegram.topics.info | quote }}
+              deploys: {{ .Values.global.telegram.topics.deploys | quote }}
   destination:
     server: {{ .Values.spec.destination.server }}
     namespace: argocd
