@@ -36,7 +36,7 @@ data:
       🔗 Revision: `{{`{{ $shortRev }}`}}`
       {{`{{- end }}`}}
       {{`{{- if (call .repo.GetCommitMetadata .app.status.sync.revision).Message }}`}}
-      💬 {{`{{ (call .repo.GetCommitMetadata .app.status.sync.revision).Message | trunc 100 }}`}}
+      💬 {{`{{ (call .repo.GetCommitMetadata .app.status.sync.revision).Message | trunc 200 }}`}}
       {{`{{- end }}`}}
 
       🔗 [Open in ArgoCD]({{`{{ .context.argocdUrl }}`}}/applications/{{`{{ .app.metadata.name }}`}})
