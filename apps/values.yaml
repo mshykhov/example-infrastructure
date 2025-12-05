@@ -26,7 +26,7 @@ global:
   # Tailscale
   tailnet: tail876052
   tailscale:
-    clientId: kZUmGQedYj11CNTRL
+    clientId: k3r7wuCSzd11CNTRL
 
   # Auth0 OIDC
   auth0:
