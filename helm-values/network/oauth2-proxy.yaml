@@ -52,7 +52,7 @@ sessionStorage:
         - "redis://oauth2-proxy-redis-announce-2:26379"
 
 # -----------------------------------------------------------------------------
-# Redis HA Subchart
+# Redis HA Subchart (minimal for dev - single replica)
 # -----------------------------------------------------------------------------
 redis:
   enabled: true
@@ -61,37 +61,37 @@ redis:
   existingSecret: oauth2-proxy-redis
   authKey: redis-password
 
-  replicas: 3
+  replicas: 1
 
   redis:
     masterGroupName: mymaster
     config:
-      min-replicas-to-write: 1
-      min-replicas-max-lag: 5
-      maxmemory: 64mb
+      min-replicas-to-write: 0
+      min-replicas-max-lag: 10
+      maxmemory: 32mb
       maxmemory-policy: volatile-lru
     resources:
       requests:
+        cpu: 10m
+        memory: 32Mi
+      limits:
         cpu: 50m
         memory: 64Mi
-      limits:
-        cpu: 200m
-        memory: 128Mi
 
   sentinel:
     resources:
       requests:
-        cpu: 25m
-        memory: 32Mi
+        cpu: 10m
+        memory: 16Mi
       limits:
-        cpu: 100m
-        memory: 64Mi
+        cpu: 50m
+        memory: 32Mi
 
   hardAntiAffinity: false
 
   persistentVolume:
     enabled: true
-    size: 1Gi
+    size: 512Mi
     storageClass: longhorn
 
   haproxy:
@@ -108,15 +108,15 @@ initContainers:
 # -----------------------------------------------------------------------------
 # Deployment Configuration
 # -----------------------------------------------------------------------------
-replicaCount: 2
+replicaCount: 1
 
 resources:
   requests:
-    cpu: 25m
-    memory: 32Mi
+    cpu: 10m
+    memory: 24Mi
   limits:
-    cpu: 100m
-    memory: 64Mi
+    cpu: 50m
+    memory: 48Mi
 
 securityContext:
   enabled: true
@@ -132,8 +132,7 @@ securityContext:
     type: RuntimeDefault
 
 podDisruptionBudget:
-  enabled: true
-  minAvailable: 1
+  enabled: false
 
 # -----------------------------------------------------------------------------
 # Service Configuration
