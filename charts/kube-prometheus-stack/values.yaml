@@ -148,6 +148,19 @@ kube-prometheus-stack:
     enabled: false
   kubeProxy:
     enabled: false
+  # ===========================================================================
+  # CUSTOM RULES - Override "for" duration
+  # Critical: 5m (fast notification)
+  # Warning: 15m (default, avoid spam)
+  # ===========================================================================
+  customRules:
+    # Critical alerts - 5m
+    KubePodCrashLooping:
+      for: 5m
+    KubePodNotReady:
+      for: 5m
+    # Warning alerts - keep 15m default (no override needed)
+
   defaultRules:
     disabled:
       InfoInhibitor: true
