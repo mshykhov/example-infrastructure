@@ -30,6 +30,8 @@ spec:
       kind: ApplicationSet
     - group: argoproj.io
       kind: AppProject
+    - group: ''
+      kind: Namespace
 
 ---
 apiVersion: argoproj.io/v1alpha1
@@ -44,7 +46,7 @@ spec:
     - 'https://charts.longhorn.io'
     - 'https://charts.external-secrets.io'
     - 'https://cloudnative-pg.github.io/charts'
-    - 'https://ot-container-kit.github.io/helm-charts'
+    - 'https://ot-container-kit.github.io/helm-charts/'
     - 'https://stakater.github.io/stakater-charts'
   destinations:
     - namespace: longhorn-system
