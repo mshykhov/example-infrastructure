@@ -9,15 +9,15 @@
 controller:
   type: daemonset
 
-# Resources for k3s
+# Resources for k3s (minimal)
 alloy:
   resources:
     requests:
-      cpu: 50m
-      memory: 64Mi
+      cpu: 25m
+      memory: 48Mi
     limits:
-      cpu: 200m
-      memory: 256Mi
+      cpu: 100m
+      memory: 128Mi
 
   # Mount paths for log collection
   mounts:
