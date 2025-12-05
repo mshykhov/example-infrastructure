@@ -1,0 +1,54 @@
+# =============================================================================
+# VELERO - Kubernetes Backup & Restore
+# =============================================================================
+# Docs: https://velero.io/docs/main/
+# Chart: https://github.com/vmware-tanzu/helm-charts
+# =============================================================================
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: velero
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "20"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  sources:
+    - repoURL: https://vmware-tanzu.github.io/helm-charts
+      chart: velero
+      targetRevision: "11.2.0"
+      helm:
+        valueFiles:
+          - $values/helm-values/backup/velero.yaml
+        valuesObject:
+          configuration:
+            backupStorageLocation:
+              - name: default
+                provider: velero.io/aws
+                bucket: {{ .Values.global.s3.buckets.velero }}
+                default: true
+                config:
+                  region: {{ .Values.global.s3.region }}
+                  s3ForcePathStyle: "true"
+                  s3Url: {{ .Values.global.s3.endpoint }}
+    - repoURL: {{ .Values.spec.source.repoURL }}
+      targetRevision: {{ .Values.spec.source.targetRevision }}
+      ref: values
+  destination:
+    server: {{ .Values.spec.destination.server }}
+    namespace: velero
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

@@ -1,0 +1,123 @@
+# =============================================================================
+# VELERO - Backup & Restore
+# =============================================================================
+# Docs: https://velero.io/docs/main/
+# S3 Config: https://github.com/vmware-tanzu/velero-plugin-for-aws
+#
+# NOTE: backupStorageLocation is configured in ArgoCD app template
+#       using global.s3.* values
+# =============================================================================
+
+# Use existing secret from external-secrets
+credentials:
+  useSecret: true
+  existingSecret: velero-s3-credentials
+
+# AWS plugin for S3-compatible storage
+initContainers:
+  - name: velero-plugin-for-aws
+    image: velero/velero-plugin-for-aws:v1.13.1
+    imagePullPolicy: IfNotPresent
+    volumeMounts:
+      - mountPath: /target
+        name: plugins
+
+configuration:
+  # Use CSI snapshots for volume backup
+  volumeSnapshotLocation: []
+
+  # Default backup TTL (30 days)
+  defaultBackupTTL: 720h
+
+  # Features
+  features: EnableCSI
+
+# Deploy node-agent for file system backups
+deployNodeAgent: true
+
+nodeAgent:
+  resources:
+    requests:
+      cpu: 25m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+
+# Velero server resources
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi
+
+# Prometheus metrics
+metrics:
+  enabled: true
+  scrapeInterval: 30s
+
+  serviceMonitor:
+    enabled: true
+    additionalLabels:
+      release: kube-prometheus-stack
+
+  prometheusRule:
+    enabled: true
+    additionalLabels:
+      release: kube-prometheus-stack
+    spec:
+      - alert: VeleroBackupFailed
+        annotations:
+          summary: "Velero backup {{ $labels.schedule }} failed"
+          description: "Velero scheduled backup has failed"
+        expr: velero_backup_last_status{schedule!=""} == 0
+        for: 15m
+        labels:
+          severity: critical
+      - alert: VeleroBackupPartiallyFailed
+        annotations:
+          summary: "Velero backup {{ $labels.schedule }} partially failed"
+          description: "Velero scheduled backup has partial failures"
+        expr: velero_backup_last_status{schedule!=""} == 2
+        for: 15m
+        labels:
+          severity: warning
+      - alert: VeleroNoRecentBackup
+        annotations:
+          summary: "No recent Velero backup for {{ $labels.schedule }}"
+          description: "Velero has not completed a successful backup in 25 hours"
+        expr: (time() - velero_backup_last_successful_timestamp{schedule!=""}) > 90000
+        for: 1h
+        labels:
+          severity: critical
+
+# Schedules for automated backups
+schedules:
+  # Daily backup of critical namespaces
+  daily-critical:
+    disabled: false
+    schedule: "0 2 * * *"
+    useOwnerReferencesInBackup: false
+    template:
+      ttl: 168h  # 7 days
+      storageLocation: default
+      includedNamespaces:
+        - monitoring
+        - argocd
+      snapshotVolumes: true
+
+  # Weekly full backup
+  weekly-full:
+    disabled: false
+    schedule: "0 3 * * 0"
+    useOwnerReferencesInBackup: false
+    template:
+      ttl: 720h  # 30 days
+      storageLocation: default
+      excludedNamespaces:
+        - kube-system
+        - kube-public
+        - kube-node-lease
+      snapshotVolumes: true
