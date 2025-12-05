@@ -32,13 +32,6 @@ configuration:
   # Default to FSB for all volumes
   defaultVolumesToFsBackup: true
 
-  # Exclude CSI snapshot resources (not installed)
-  defaultBackupExcludedResources:
-    - volumesnapshots.snapshot.storage.k8s.io
-    - volumesnapshotcontents.snapshot.storage.k8s.io
-    - volumesnapshotclasses.snapshot.storage.k8s.io
-    - clusters.postgresql.cnpg.io
-
 # Deploy node-agent for file system backups
 deployNodeAgent: true
 
@@ -114,6 +107,10 @@ schedules:
         - monitoring
         - argocd
       defaultVolumesToFsBackup: true
+      # Exclude CNPG Cluster CRD - causes restore issues, ArgoCD will recreate
+      # See: https://github.com/cloudnative-pg/cloudnative-pg/issues/5912
+      excludedNamespaceScopedResources:
+        - clusters.postgresql.cnpg.io
 
   # Weekly full backup
   weekly-full:
@@ -129,3 +126,7 @@ schedules:
         - kube-node-lease
         - velero
       defaultVolumesToFsBackup: true
+      # Exclude CNPG Cluster CRD - causes restore issues, ArgoCD will recreate
+      # See: https://github.com/cloudnative-pg/cloudnative-pg/issues/5912
+      excludedNamespaceScopedResources:
+        - clusters.postgresql.cnpg.io
