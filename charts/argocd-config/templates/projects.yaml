@@ -143,6 +143,8 @@ spec:
   description: Databases and caches (PostgreSQL, Redis clusters)
   sourceRepos:
     - '{{ .Values.spec.source.repoURL }}'
+    - '{{ .Values.deploy.repoURL }}'
+    - 'https://cloudnative-pg.github.io/charts'
   destinations:
     - namespace: 'example-*'
       server: https://kubernetes.default.svc
