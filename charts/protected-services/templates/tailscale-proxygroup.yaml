@@ -1,0 +1,14 @@
+# ProxyGroup for HA Tailscale Ingress
+# Reduces race conditions and provides high availability
+# Docs: https://tailscale.com/kb/1439/kubernetes-operator-cluster-ingress#high-availability
+apiVersion: tailscale.com/v1alpha1
+kind: ProxyGroup
+metadata:
+  name: ingress-proxies
+  namespace: tailscale
+spec:
+  type: ingress
+  replicas: 2
+  hostnamePrefix: ts-ingress
+  tags:
+    - tag:k8s

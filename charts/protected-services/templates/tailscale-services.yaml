@@ -6,6 +6,8 @@ kind: Ingress
 metadata:
   name: {{ $name }}-tailscale
   namespace: ingress-nginx
+  annotations:
+    tailscale.com/proxy-group: ingress-proxies
 spec:
   ingressClassName: tailscale
   tls:
