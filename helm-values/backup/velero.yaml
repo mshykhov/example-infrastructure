@@ -37,6 +37,7 @@ configuration:
     - volumesnapshots.snapshot.storage.k8s.io
     - volumesnapshotcontents.snapshot.storage.k8s.io
     - volumesnapshotclasses.snapshot.storage.k8s.io
+    - clusters.postgresql.cnpg.io
 
 # Deploy node-agent for file system backups
 deployNodeAgent: true
