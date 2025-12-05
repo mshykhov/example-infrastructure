@@ -21,10 +21,10 @@ controller:
 
   resources:
     requests:
-      cpu: 100m
-      memory: 128Mi
+      cpu: 50m
+      memory: 90Mi
     limits:
-      cpu: 500m
+      cpu: 200m
       memory: 256Mi
 
   # Security
