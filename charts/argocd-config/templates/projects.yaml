@@ -69,6 +69,16 @@ spec:
       server: https://kubernetes.default.svc
     - namespace: 'example-*'
       server: https://kubernetes.default.svc
+    - namespace: cloudflare
+      server: https://kubernetes.default.svc
+    - namespace: oauth2-proxy
+      server: https://kubernetes.default.svc
+    - namespace: tailscale
+      server: https://kubernetes.default.svc
+    - namespace: velero
+      server: https://kubernetes.default.svc
+    - namespace: external-dns
+      server: https://kubernetes.default.svc
   clusterResourceWhitelist:
     - group: '*'
       kind: '*'
