@@ -23,14 +23,20 @@ initContainers:
         name: plugins
 
 configuration:
-  # Use CSI snapshots for volume backup
+  # No CSI snapshots - use File System Backup instead
   volumeSnapshotLocation: []
 
   # Default backup TTL (30 days)
   defaultBackupTTL: 720h
 
-  # Features
-  features: EnableCSI
+  # Default to FSB for all volumes
+  defaultVolumesToFsBackup: true
+
+  # Exclude CSI snapshot resources (not installed)
+  defaultBackupExcludedResources:
+    - volumesnapshots.snapshot.storage.k8s.io
+    - volumesnapshotcontents.snapshot.storage.k8s.io
+    - volumesnapshotclasses.snapshot.storage.k8s.io
 
 # Deploy node-agent for file system backups
 deployNodeAgent: true
@@ -106,7 +112,7 @@ schedules:
       includedNamespaces:
         - monitoring
         - argocd
-      snapshotVolumes: true
+      defaultVolumesToFsBackup: true
 
   # Weekly full backup
   weekly-full:
@@ -120,4 +126,5 @@ schedules:
         - kube-system
         - kube-public
         - kube-node-lease
-      snapshotVolumes: true
+        - velero
+      defaultVolumesToFsBackup: true
