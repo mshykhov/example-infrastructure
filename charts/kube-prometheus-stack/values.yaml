@@ -24,14 +24,14 @@ kube-prometheus-stack:
     persistence:
       enabled: true
       storageClassName: longhorn
-      size: 5Gi
+      size: 2Gi
     resources:
       requests:
-        cpu: 100m
-        memory: 256Mi
+        cpu: 50m
+        memory: 128Mi
       limits:
-        cpu: 500m
-        memory: 512Mi
+        cpu: 200m
+        memory: 256Mi
     defaultDashboardsEnabled: true
     defaultDashboardsTimezone: utc
     additionalDataSources:
@@ -47,8 +47,8 @@ kube-prometheus-stack:
   prometheus:
     enabled: true
     prometheusSpec:
-      retention: 15d
-      retentionSize: "10GB"
+      retention: 7d
+      retentionSize: "5GB"
       storageSpec:
         volumeClaimTemplate:
           spec:
@@ -56,14 +56,14 @@ kube-prometheus-stack:
             accessModes: ["ReadWriteOnce"]
             resources:
               requests:
-                storage: 20Gi
+                storage: 10Gi
       resources:
         requests:
-          cpu: 200m
-          memory: 512Mi
+          cpu: 100m
+          memory: 256Mi
         limits:
-          cpu: 1000m
-          memory: 2Gi
+          cpu: 500m
+          memory: 1Gi
       serviceMonitorSelectorNilUsesHelmValues: false
       podMonitorSelectorNilUsesHelmValues: false
     ingress:
@@ -86,14 +86,14 @@ kube-prometheus-stack:
             accessModes: ["ReadWriteOnce"]
             resources:
               requests:
-                storage: 2Gi
+                storage: 1Gi
       resources:
         requests:
-          cpu: 50m
-          memory: 64Mi
+          cpu: 25m
+          memory: 32Mi
         limits:
-          cpu: 200m
-          memory: 256Mi
+          cpu: 100m
+          memory: 128Mi
     ingress:
       enabled: false
 
@@ -106,11 +106,11 @@ kube-prometheus-stack:
   prometheus-node-exporter:
     resources:
       requests:
-        cpu: 50m
-        memory: 32Mi
+        cpu: 10m
+        memory: 24Mi
       limits:
-        cpu: 200m
-        memory: 64Mi
+        cpu: 100m
+        memory: 48Mi
 
   # ===========================================================================
   # KUBE-STATE-METRICS
@@ -121,11 +121,11 @@ kube-prometheus-stack:
   kube-state-metrics:
     resources:
       requests:
-        cpu: 50m
-        memory: 64Mi
+        cpu: 10m
+        memory: 32Mi
       limits:
-        cpu: 200m
-        memory: 256Mi
+        cpu: 100m
+        memory: 128Mi
 
   # ===========================================================================
   # PROMETHEUS OPERATOR
@@ -133,11 +133,11 @@ kube-prometheus-stack:
   prometheusOperator:
     resources:
       requests:
-        cpu: 100m
-        memory: 128Mi
+        cpu: 50m
+        memory: 64Mi
       limits:
-        cpu: 500m
-        memory: 512Mi
+        cpu: 200m
+        memory: 256Mi
 
   # ===========================================================================
   # K3S SPECIFIC
