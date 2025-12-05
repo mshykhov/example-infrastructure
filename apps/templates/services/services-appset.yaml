@@ -49,7 +49,7 @@ spec:
         env: '{{`{{ .env }}`}}'
         deploy-notify: "true"
     spec:
-      project: default
+      project: applications
       source:
         repoURL: {{ .Values.deploy.repoURL }}
         targetRevision: {{ .Values.deploy.targetRevision }}
@@ -72,6 +72,8 @@ spec:
           labels:
             app: '{{`{{ .path.basename }}`}}'
             env: '{{`{{ .env }}`}}'
+            tier: application
+            team: backend
             dockerhub-pull: "true"
         syncOptions:
           - CreateNamespace=true

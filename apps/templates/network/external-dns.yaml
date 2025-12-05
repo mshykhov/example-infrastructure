@@ -16,7 +16,7 @@ metadata:
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
-  project: default
+  project: network
   sources:
     - repoURL: https://kubernetes-sigs.github.io/external-dns
       chart: external-dns
@@ -34,5 +34,9 @@ spec:
     automated:
       prune: true
       selfHeal: true
+    managedNamespaceMetadata:
+      labels:
+        tier: network
+        team: platform
     syncOptions:
       - CreateNamespace=true

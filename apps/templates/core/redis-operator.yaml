@@ -20,7 +20,7 @@ metadata:
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
-  project: default
+  project: infrastructure
   sources:
     - repoURL: https://ot-container-kit.github.io/helm-charts/
       chart: redis-operator
@@ -38,6 +38,10 @@ spec:
     automated:
       prune: true
       selfHeal: true
+    managedNamespaceMetadata:
+      labels:
+        tier: infrastructure
+        team: platform
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true

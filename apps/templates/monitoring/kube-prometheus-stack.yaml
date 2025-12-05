@@ -14,7 +14,7 @@ metadata:
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
-  project: default
+  project: monitoring
   source:
     repoURL: {{ .Values.spec.source.repoURL }}
     targetRevision: {{ .Values.spec.source.targetRevision }}
@@ -37,6 +37,10 @@ spec:
     automated:
       prune: true
       selfHeal: true
+    managedNamespaceMetadata:
+      labels:
+        tier: monitoring
+        team: platform
     syncOptions:
       - ServerSideApply=true
       - CreateNamespace=true

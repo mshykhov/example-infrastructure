@@ -14,7 +14,7 @@ metadata:
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
-  project: default
+  project: backup
   sources:
     - repoURL: https://vmware-tanzu.github.io/helm-charts
       chart: velero
@@ -43,6 +43,10 @@ spec:
     automated:
       prune: true
       selfHeal: true
+    managedNamespaceMetadata:
+      labels:
+        tier: backup
+        team: platform
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true

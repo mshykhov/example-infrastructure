@@ -3,6 +3,11 @@ kind: Deployment
 metadata:
   name: cloudflared
   namespace: cloudflare
+  labels:
+    app.kubernetes.io/name: cloudflared
+    app.kubernetes.io/instance: cloudflared
+    app.kubernetes.io/component: tunnel
+    app.kubernetes.io/part-of: cloudflare
 spec:
   replicas: {{ .Values.replicas }}
   selector:

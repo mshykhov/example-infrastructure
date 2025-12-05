@@ -16,7 +16,7 @@ metadata:
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
-  project: default
+  project: infrastructure
   sources:
     - repoURL: https://stakater.github.io/stakater-charts
       chart: reloader
@@ -34,6 +34,10 @@ spec:
     automated:
       prune: true
       selfHeal: true
+    managedNamespaceMetadata:
+      labels:
+        tier: infrastructure
+        team: platform
     syncOptions:
       - CreateNamespace=true
     retry:

@@ -61,7 +61,7 @@ spec:
         env: '{{`{{ .env }}`}}'
         type: postgres
     spec:
-      project: default
+      project: data
       sources:
         - repoURL: https://cloudnative-pg.github.io/charts
           chart: cluster

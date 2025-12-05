@@ -68,7 +68,7 @@ spec:
         env: '{{`{{ .env }}`}}'
         type: redis
     spec:
-      project: default
+      project: data
       sources:
         - repoURL: {{ .Values.spec.source.repoURL }}
           targetRevision: {{ .Values.spec.source.targetRevision }}

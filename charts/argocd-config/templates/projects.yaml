@@ -1,0 +1,191 @@
+# =============================================================================
+# ARGOCD PROJECTS - ISOLATION & RBAC
+# =============================================================================
+# Docs: https://argo-cd.readthedocs.io/en/stable/user-guide/projects/
+#
+# Projects provide:
+# - Restrict source repos
+# - Restrict destination clusters/namespaces
+# - Restrict deployable resource kinds
+# =============================================================================
+
+# Lock down default project - only allow root app
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: default
+  namespace: argocd
+spec:
+  description: Locked - only for bootstrap root application
+  sourceRepos:
+    - '{{ .Values.spec.source.repoURL }}'
+  destinations:
+    - namespace: argocd
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: argoproj.io
+      kind: Application
+    - group: argoproj.io
+      kind: ApplicationSet
+    - group: argoproj.io
+      kind: AppProject
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: infrastructure
+  namespace: argocd
+spec:
+  description: Core infrastructure components (storage, secrets, operators)
+  sourceRepos:
+    - '{{ .Values.spec.source.repoURL }}'
+    - 'https://charts.longhorn.io'
+    - 'https://charts.external-secrets.io'
+    - 'https://cloudnative-pg.github.io/charts'
+    - 'https://ot-container-kit.github.io/helm-charts'
+    - 'https://stakater.github.io/stakater-charts'
+  destinations:
+    - namespace: longhorn-system
+      server: https://kubernetes.default.svc
+    - namespace: external-secrets
+      server: https://kubernetes.default.svc
+    - namespace: cnpg-system
+      server: https://kubernetes.default.svc
+    - namespace: redis-operator
+      server: https://kubernetes.default.svc
+    - namespace: reloader
+      server: https://kubernetes.default.svc
+    - namespace: kube-system
+      server: https://kubernetes.default.svc
+    - namespace: default
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: network
+  namespace: argocd
+spec:
+  description: Network, ingress, and access control
+  sourceRepos:
+    - '{{ .Values.spec.source.repoURL }}'
+    - 'https://kubernetes.github.io/ingress-nginx'
+    - 'https://pkgs.tailscale.com/helmcharts'
+    - 'https://oauth2-proxy.github.io/manifests'
+    - 'https://kubernetes-sigs.github.io/external-dns'
+  destinations:
+    - namespace: ingress-nginx
+      server: https://kubernetes.default.svc
+    - namespace: tailscale
+      server: https://kubernetes.default.svc
+    - namespace: cloudflare
+      server: https://kubernetes.default.svc
+    - namespace: oauth2-proxy
+      server: https://kubernetes.default.svc
+    - namespace: external-dns
+      server: https://kubernetes.default.svc
+    - namespace: default
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: monitoring
+  namespace: argocd
+spec:
+  description: Monitoring, logging, and alerting
+  sourceRepos:
+    - '{{ .Values.spec.source.repoURL }}'
+    - 'https://prometheus-community.github.io/helm-charts'
+    - 'https://grafana.github.io/helm-charts'
+  destinations:
+    - namespace: monitoring
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: cicd
+  namespace: argocd
+spec:
+  description: CI/CD and GitOps components
+  sourceRepos:
+    - '{{ .Values.spec.source.repoURL }}'
+    - 'https://argoproj.github.io/argo-helm'
+  destinations:
+    - namespace: argocd
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: data
+  namespace: argocd
+spec:
+  description: Databases and caches (PostgreSQL, Redis clusters)
+  sourceRepos:
+    - '{{ .Values.spec.source.repoURL }}'
+  destinations:
+    - namespace: 'example-*'
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: applications
+  namespace: argocd
+spec:
+  description: Business applications
+  sourceRepos:
+    - '{{ .Values.deploy.repoURL }}'
+  destinations:
+    - namespace: 'example-*'
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: ''
+      kind: Namespace
+  namespaceResourceBlacklist:
+    - group: ''
+      kind: ResourceQuota
+    - group: ''
+      kind: LimitRange
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: backup
+  namespace: argocd
+spec:
+  description: Backup and disaster recovery
+  sourceRepos:
+    - '{{ .Values.spec.source.repoURL }}'
+    - 'https://vmware-tanzu.github.io/helm-charts'
+  destinations:
+    - namespace: velero
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'

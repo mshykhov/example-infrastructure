@@ -23,7 +23,7 @@ metadata:
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
-  project: default
+  project: network
   sources:
     - repoURL: https://pkgs.tailscale.com/helmcharts
       chart: tailscale-operator
@@ -41,6 +41,10 @@ spec:
     automated:
       prune: true
       selfHeal: true
+    managedNamespaceMetadata:
+      labels:
+        tier: network
+        team: platform
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
