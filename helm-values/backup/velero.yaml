@@ -94,6 +94,8 @@ metrics:
           severity: critical
 
 # Schedules for automated backups
+# NOTE: PostgreSQL PVC excluded via pod annotation in CNPG cluster config
+#       CNPG handles its own backups via Barman to S3
 schedules:
   # Daily backup of critical namespaces
   daily-critical:
@@ -107,8 +109,7 @@ schedules:
         - monitoring
         - argocd
       defaultVolumesToFsBackup: true
-      # Exclude CNPG Cluster CRD - causes restore issues, ArgoCD will recreate
-      # See: https://github.com/cloudnative-pg/cloudnative-pg/issues/5912
+      # Exclude CNPG Cluster CRD - ArgoCD will recreate
       excludedNamespaceScopedResources:
         - clusters.postgresql.cnpg.io
 
@@ -126,7 +127,6 @@ schedules:
         - kube-node-lease
         - velero
       defaultVolumesToFsBackup: true
-      # Exclude CNPG Cluster CRD - causes restore issues, ArgoCD will recreate
-      # See: https://github.com/cloudnative-pg/cloudnative-pg/issues/5912
+      # Exclude CNPG Cluster CRD - ArgoCD will recreate
       excludedNamespaceScopedResources:
         - clusters.postgresql.cnpg.io

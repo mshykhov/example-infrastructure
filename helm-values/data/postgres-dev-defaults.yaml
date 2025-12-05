@@ -28,3 +28,7 @@ cluster:
     enabled: true
     podMonitor:
       enabled: true
+
+  # Exclude from Velero FSB - CNPG uses its own S3 backup
+  additionalAnnotations:
+    backup.velero.io/backup-volumes-excludes: pgdata
