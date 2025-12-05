@@ -25,9 +25,9 @@ spec:
       valuesObject:
         spec:
           source:
-            repoURL: {{ .Values.spec.source.repoURL }}
+            repoURL: "{{ .Values.spec.source.repoURL }}"
         deploy:
-          repoURL: {{ .Values.deploy.repoURL }}
+          repoURL: "{{ .Values.deploy.repoURL }}"
         global:
           tailnet: {{ .Values.global.tailnet }}
           auth0:
