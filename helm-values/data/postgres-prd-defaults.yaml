@@ -33,3 +33,41 @@ cluster:
 
   affinity:
     topologyKey: kubernetes.io/hostname
+
+# =============================================================================
+# BACKUPS - Barman to S3 (Cloudflare R2)
+# =============================================================================
+# Docs: https://cloudnative-pg.io/documentation/current/backup/
+# =============================================================================
+backups:
+  enabled: true
+  provider: s3
+  retentionPolicy: "30d"
+
+  endpointURL: https://4aa95df965d3bc2bfaabe9012a35857c.r2.cloudflarestorage.com
+  destinationPath: s3://postgresql-backups/
+
+  s3:
+    region: auto
+    bucket: postgresql-backups
+    path: /
+    accessKey: ""
+    secretKey: ""
+
+  secret:
+    create: false
+    name: cnpg-backup-s3
+
+  scheduledBackups:
+    - name: daily
+      schedule: "0 0 2 * * *"
+      backupOwnerReference: self
+      method: barmanObjectStore
+
+  data:
+    compression: gzip
+    jobs: 2
+
+  wal:
+    compression: gzip
+    maxParallel: 2

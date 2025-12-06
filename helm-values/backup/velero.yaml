@@ -93,13 +93,24 @@ metrics:
         labels:
           severity: critical
 
-# Schedules for automated backups
-# NOTE: PostgreSQL PVCs excluded via volumePolicies (pvcLabels: cnpg.io/pvcRole)
-#       CNPG handles its own backups via Barman to S3
-#       See: manifests/backup/velero-resource-policies.yaml
+# =============================================================================
+# BACKUP SCHEDULES
+# =============================================================================
+# Strategy:
+#   - Daily: Application data (Redis), Monitoring, Infrastructure
+#   - Weekly: Full cluster backup
+#
+# Exclusions:
+#   - PostgreSQL PVCs via volumePolicies (CNPG uses Barman S3 backup)
+#   - System namespaces (kube-system, kube-public, etc.)
+#
+# See: manifests/backup/velero-resource-policies.yaml
+# =============================================================================
 schedules:
-  # Daily backup of critical namespaces
-  daily-critical:
+  # ---------------------------------------------------------------------------
+  # DAILY: Applications (Redis cache, app configs)
+  # ---------------------------------------------------------------------------
+  daily-applications:
     disabled: false
     schedule: "0 2 * * *"
     useOwnerReferencesInBackup: false
@@ -107,17 +118,50 @@ schedules:
       ttl: 168h  # 7 days
       storageLocation: default
       includedNamespaces:
-        - monitoring
-        - argocd
+        - example-api-dev
+        - example-api-prd
+        - example-ui-dev
+        - example-ui-prd
       defaultVolumesToFsBackup: true
       resourcePolicy:
         kind: ConfigMap
         name: velero-resource-policies
 
-  # Weekly full backup
+  # ---------------------------------------------------------------------------
+  # DAILY: Monitoring stack (Grafana, Prometheus, Alertmanager, Loki)
+  # ---------------------------------------------------------------------------
+  daily-monitoring:
+    disabled: false
+    schedule: "30 2 * * *"
+    useOwnerReferencesInBackup: false
+    template:
+      ttl: 168h  # 7 days
+      storageLocation: default
+      includedNamespaces:
+        - monitoring
+      defaultVolumesToFsBackup: true
+
+  # ---------------------------------------------------------------------------
+  # DAILY: Infrastructure (ArgoCD, OAuth2 sessions)
+  # ---------------------------------------------------------------------------
+  daily-infrastructure:
+    disabled: false
+    schedule: "0 3 * * *"
+    useOwnerReferencesInBackup: false
+    template:
+      ttl: 168h  # 7 days
+      storageLocation: default
+      includedNamespaces:
+        - argocd
+        - oauth2-proxy
+      defaultVolumesToFsBackup: true
+
+  # ---------------------------------------------------------------------------
+  # WEEKLY: Full cluster backup (disaster recovery)
+  # ---------------------------------------------------------------------------
   weekly-full:
     disabled: false
-    schedule: "0 3 * * 0"
+    schedule: "0 4 * * 0"
     useOwnerReferencesInBackup: false
     template:
       ttl: 720h  # 30 days
@@ -127,6 +171,8 @@ schedules:
         - kube-public
         - kube-node-lease
         - velero
+        - longhorn-system
+        - cnpg-system
       defaultVolumesToFsBackup: true
       resourcePolicy:
         kind: ConfigMap
