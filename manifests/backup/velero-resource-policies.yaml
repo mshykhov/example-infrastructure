@@ -1,0 +1,32 @@
+# =============================================================================
+# VELERO RESOURCE POLICIES - Exclude CNPG PostgreSQL PVCs
+# =============================================================================
+# Docs: https://velero.io/docs/main/resource-filtering/#resource-policies
+#
+# This ConfigMap excludes CloudNativePG PostgreSQL PVCs from Velero FSB.
+# CNPG handles its own backups via Barman to S3.
+#
+# CNPG automatically labels PVCs with: cnpg.io/pvcRole: PG_DATA
+# Velero volumePolicies can filter by pvcLabels.
+# =============================================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: velero-resource-policies
+  namespace: velero
+data:
+  policies.yaml: |
+    version: v1
+    volumePolicies:
+      # Skip CNPG PostgreSQL data volumes - they use Barman S3 backup
+      - conditions:
+          pvcLabels:
+            cnpg.io/pvcRole: PG_DATA
+        action:
+          type: skip
+      # Skip CNPG PostgreSQL WAL volumes if separate
+      - conditions:
+          pvcLabels:
+            cnpg.io/pvcRole: PG_WAL
+        action:
+          type: skip

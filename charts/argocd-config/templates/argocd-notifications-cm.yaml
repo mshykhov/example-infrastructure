@@ -99,11 +99,11 @@ data:
       🏷 Namespace: `{{`{{ .app.spec.destination.namespace }}`}}`
 
   trigger.on-deployed: |
-    - description: Application is synced and healthy. Only triggers when resources actually changed.
+    - description: Application is synced and healthy.
       oncePer: app.status.operationState?.syncResult?.revision
       send:
         - app-deployed
-      when: app.status.operationState != nil and app.status.operationState.phase in ['Succeeded'] and app.status.health.status == 'Healthy' and any(app.status.operationState.syncResult.resources, {.message matches '(configured|created|pruned)'})
+      when: app.status.operationState != nil and app.status.operationState.phase in ['Succeeded'] and app.status.health.status == 'Healthy'
 
   trigger.on-sync-failed: |
     - description: Application syncing has failed

@@ -94,8 +94,9 @@ metrics:
           severity: critical
 
 # Schedules for automated backups
-# NOTE: PostgreSQL PVC excluded via pod annotation in CNPG cluster config
+# NOTE: PostgreSQL PVCs excluded via volumePolicies (pvcLabels: cnpg.io/pvcRole)
 #       CNPG handles its own backups via Barman to S3
+#       See: manifests/backup/velero-resource-policies.yaml
 schedules:
   # Daily backup of critical namespaces
   daily-critical:
@@ -109,9 +110,9 @@ schedules:
         - monitoring
         - argocd
       defaultVolumesToFsBackup: true
-      # Exclude CNPG Cluster CRD - ArgoCD will recreate
-      excludedNamespaceScopedResources:
-        - clusters.postgresql.cnpg.io
+      resourcePolicy:
+        kind: ConfigMap
+        name: velero-resource-policies
 
   # Weekly full backup
   weekly-full:
@@ -127,6 +128,6 @@ schedules:
         - kube-node-lease
         - velero
       defaultVolumesToFsBackup: true
-      # Exclude CNPG Cluster CRD - ArgoCD will recreate
-      excludedNamespaceScopedResources:
-        - clusters.postgresql.cnpg.io
+      resourcePolicy:
+        kind: ConfigMap
+        name: velero-resource-policies
