@@ -71,3 +71,20 @@ backups:
   wal:
     compression: gzip
     maxParallel: 2
+
+# =============================================================================
+# RECOVERY - Pre-configured S3 settings (same as backups)
+# =============================================================================
+# To restore: set mode: recovery + recovery.clusterName in service values
+# =============================================================================
+recovery:
+  method: object_store
+  provider: s3
+  endpointURL: https://4aa95df965d3bc2bfaabe9012a35857c.r2.cloudflarestorage.com
+  destinationPath: s3://postgresql-backups/
+  s3:
+    region: auto
+    bucket: postgresql-backups
+  secret:
+    create: false
+    name: cnpg-backup-s3
