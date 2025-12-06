@@ -56,7 +56,7 @@ backups:
   scheduledBackups:
     - name: weekly
       schedule: "0 0 3 * * 0"
-      backupOwnerReference: self
+      backupOwnerReference: cluster
       method: barmanObjectStore
 
   data:
