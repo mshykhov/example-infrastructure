@@ -1,5 +1,5 @@
 {{- range $name, $service := .Values.services }}
-{{- if and $service.enabled (not $service.hostname) }}
+{{- if and $service.enabled (not (or $service.hostname (hasKey $service "subdomain"))) }}
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress

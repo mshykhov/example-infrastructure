@@ -39,9 +39,10 @@ data:
       {{`{{- $images := .app.status.summary.images }}`}}
       {{`{{- $imageCount := len $images }}`}}
       {{`{{- if eq $imageCount 1 }}`}}
-      🐳 Image: `{{`{{ index $images 0 }}`}}`
+      🔄 Config sync
+      🐳 `{{`{{ index $images 0 }}`}}`
       {{`{{- else if eq $imageCount 2 }}`}}
-      🐳 Image:
+      🆕 Image update:
         Old: `{{`{{ index $images 0 }}`}}`
         New: `{{`{{ index $images 1 }}`}}`
       {{`{{- else }}`}}
