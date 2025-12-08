@@ -104,12 +104,10 @@ alloy:
       }
 
       // Process logs - add cluster label
-      // Source: apps/values.yaml -> global.cluster
-      // NOTE: Raw config - must sync manually with global.cluster value
       loki.process "pod_logs" {
         stage.static_labels {
           values = {
-            cluster = "k3s-home",
+            cluster = "{{ .Values.global.cluster }}",
           }
         }
 

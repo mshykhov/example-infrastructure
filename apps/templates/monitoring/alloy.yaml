@@ -23,6 +23,9 @@ spec:
       helm:
         valueFiles:
           - $values/helm-values/monitoring/alloy.yaml
+        valuesObject:
+          global:
+            cluster: {{ .Values.global.cluster }}
     - repoURL: {{ .Values.spec.source.repoURL }}
       targetRevision: {{ .Values.spec.source.targetRevision }}
       ref: values
