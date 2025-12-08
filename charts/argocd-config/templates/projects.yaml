@@ -67,8 +67,12 @@ spec:
       server: https://kubernetes.default.svc
     - namespace: monitoring
       server: https://kubernetes.default.svc
-    - namespace: 'example-*'
+    {{- range .Values.global.services }}
+    - namespace: '{{ . }}-dev'
       server: https://kubernetes.default.svc
+    - namespace: '{{ . }}-prd'
+      server: https://kubernetes.default.svc
+    {{- end }}
     - namespace: cloudflare
       server: https://kubernetes.default.svc
     - namespace: oauth2-proxy
@@ -114,8 +118,12 @@ spec:
       server: https://kubernetes.default.svc
     - namespace: longhorn-system
       server: https://kubernetes.default.svc
-    - namespace: 'example-*'
+    {{- range .Values.global.services }}
+    - namespace: '{{ . }}-dev'
       server: https://kubernetes.default.svc
+    - namespace: '{{ . }}-prd'
+      server: https://kubernetes.default.svc
+    {{- end }}
   clusterResourceWhitelist:
     - group: '*'
       kind: '*'
@@ -172,8 +180,12 @@ spec:
     - '{{ .Values.deploy.repoURL }}'
     - 'https://cloudnative-pg.github.io/charts'
   destinations:
-    - namespace: 'example-*'
+    {{- range .Values.global.services }}
+    - namespace: '{{ . }}-dev'
       server: https://kubernetes.default.svc
+    - namespace: '{{ . }}-prd'
+      server: https://kubernetes.default.svc
+    {{- end }}
   clusterResourceWhitelist:
     - group: '*'
       kind: '*'
@@ -189,8 +201,12 @@ spec:
   sourceRepos:
     - '{{ .Values.deploy.repoURL }}'
   destinations:
-    - namespace: 'example-*'
+    {{- range .Values.global.services }}
+    - namespace: '{{ . }}-dev'
       server: https://kubernetes.default.svc
+    - namespace: '{{ . }}-prd'
+      server: https://kubernetes.default.svc
+    {{- end }}
   clusterResourceWhitelist:
     - group: ''
       kind: Namespace

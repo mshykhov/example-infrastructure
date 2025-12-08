@@ -29,6 +29,8 @@ spec:
         deploy:
           repoURL: "{{ .Values.deploy.repoURL }}"
         global:
+          services:
+            {{- toYaml .Values.global.services | nindent 12 }}
           tailnet: {{ .Values.global.tailnet }}
           auth0:
             domain: {{ .Values.global.auth0.domain }}
