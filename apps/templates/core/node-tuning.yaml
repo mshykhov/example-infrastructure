@@ -2,7 +2,7 @@
 # NODE TUNING - Kernel parameters for observability stack
 # =============================================================================
 # Fixes inotify limits for Alloy log collection
-# Must run before monitoring stack (wave 29)
+# Must run BEFORE monitoring stack (wave 30)
 # =============================================================================
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -10,7 +10,7 @@ metadata:
   name: node-tuning
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "29"
+    argocd.argoproj.io/sync-wave: "2"
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
@@ -28,3 +28,9 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=false
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

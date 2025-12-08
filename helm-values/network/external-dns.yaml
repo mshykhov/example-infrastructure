@@ -13,8 +13,9 @@ extraArgs:
   - --cloudflare-dns-records-per-page=5000
   - --txt-prefix=extdns-
 
-domainFilters:
-  - untrustedonline.org
+# domainFilters set via valuesObject in Application template
+# Source: apps/values.yaml -> global.domain
+domainFilters: []
 
 sources:
   - ingress
@@ -23,7 +24,7 @@ policy: sync
 
 txtOwnerId: external-dns
 
-logLevel: debug
+logLevel: info
 
 resources:
   requests:

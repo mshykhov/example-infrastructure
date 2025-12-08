@@ -14,18 +14,26 @@ controller:
     default: true
 
   # Enable for oauth2-proxy auth annotations
+  # WARNING: allow-snippet-annotations enables server-snippet in ingress annotations.
+  # Required for oauth2-proxy logout redirect (see protected-services/templates/ingresses.yaml).
+  # Risk: Untrusted ingress definitions could inject arbitrary nginx config.
+  # Mitigation: Only trusted admins can create Ingress resources (RBAC).
   config:
     use-forwarded-headers: "true"
     allow-snippet-annotations: "true"
     annotations-risk-level: "Critical"
 
+  # Resources - increased per Alibaba best practices:
+  # https://www.alibabacloud.com/help/en/ack/ack-managed-and-ack-dedicated/user-guide/best-practices-for-the-nginx-ingress-controller
+  # Recommendation: CPU limit 1000m+, Memory limit 2Gi+ (or no limits to avoid OOM)
+  # For k3s-home single-node: using moderate limits, increase if OOM occurs
   resources:
     requests:
-      cpu: 50m
-      memory: 90Mi
+      cpu: 100m
+      memory: 128Mi
     limits:
-      cpu: 200m
-      memory: 256Mi
+      cpu: 500m
+      memory: 512Mi
 
   # Security
   podSecurityContext:

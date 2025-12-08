@@ -106,6 +106,12 @@ spec:
         automated:
           prune: true
           selfHeal: true
+        managedNamespaceMetadata:
+          labels:
+            app: '{{`{{ index .path.segments 1 }}`}}'
+            env: '{{`{{ .env }}`}}'
+            tier: application
+            team: backend
         syncOptions:
           - CreateNamespace=true
           - ServerSideApply=true

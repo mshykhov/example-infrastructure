@@ -73,7 +73,8 @@ services:
   example-api-prd:
     enabled: true
     oauth2: false
-    hostname: api.untrustedonline.org
+    # Public hostname: api.{global.domain}
+    subdomain: api
     namespace: example-api-prd
     backend:
       name: example-api-prd
@@ -82,7 +83,8 @@ services:
   example-ui-prd:
     enabled: true
     oauth2: false
-    hostname: untrustedonline.org
+    # Public hostname: {global.domain} (root domain)
+    subdomain: ""
     namespace: example-ui-prd
     backend:
       name: example-ui-prd

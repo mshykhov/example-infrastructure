@@ -9,15 +9,18 @@
 controller:
   type: daemonset
 
-# Resources for k3s (minimal)
+# Resources - per Grafana docs:
+# https://grafana.com/docs/alloy/latest/introduction/estimate-resource-usage/
+# Logs: ~1 CPU / 120Mi per 1 MiB/s, real-world often 300Mi-1Gi
+# k3s-home: moderate limit, increase if OOM occurs
 alloy:
   resources:
     requests:
-      cpu: 25m
-      memory: 48Mi
-    limits:
-      cpu: 100m
+      cpu: 50m
       memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 512Mi
 
   # Mount paths for log collection
   mounts:
@@ -101,6 +104,8 @@ alloy:
       }
 
       // Process logs - add cluster label
+      // Source: apps/values.yaml -> global.cluster
+      // NOTE: Raw config - must sync manually with global.cluster value
       loki.process "pod_logs" {
         stage.static_labels {
           values = {

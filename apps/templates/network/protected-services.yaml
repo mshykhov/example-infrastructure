@@ -23,6 +23,7 @@ spec:
       valuesObject:
         global:
           tailnet: {{ .Values.global.tailnet }}
+          domain: {{ .Values.global.domain }}
           auth0:
             domain: {{ .Values.global.auth0.domain }}
             clientId: {{ .Values.global.auth0.clientId }}

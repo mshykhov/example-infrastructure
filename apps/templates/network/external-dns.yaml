@@ -24,6 +24,9 @@ spec:
       helm:
         valueFiles:
           - $values/helm-values/network/external-dns.yaml
+        valuesObject:
+          domainFilters:
+            - {{ .Values.global.domain }}
     - repoURL: {{ .Values.spec.source.repoURL }}
       targetRevision: {{ .Values.spec.source.targetRevision }}
       ref: values
@@ -40,3 +43,9 @@ spec:
         team: platform
     syncOptions:
       - CreateNamespace=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

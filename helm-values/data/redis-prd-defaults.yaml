@@ -7,7 +7,8 @@
 
 mode: sentinel
 
-clusterSize: 2
+# HA: 3 для sentinel quorum (1 master + 2 replicas)
+clusterSize: 3
 
 resources:
   requests:

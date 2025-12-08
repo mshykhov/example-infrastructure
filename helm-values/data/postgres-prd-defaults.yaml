@@ -3,6 +3,8 @@
 # =============================================================================
 # Applied to all PostgreSQL clusters in prd environment.
 # Service-specific values in <service>-db.yaml override these.
+#
+# S3 endpoint source: apps/values.yaml -> global.s3.endpoint
 # =============================================================================
 
 type: postgresql
@@ -11,11 +13,16 @@ version:
   postgresql: "17"
 
 cluster:
-  instances: 1
+  # HA: минимум 3 для quorum и fault tolerance
+  instances: 3
 
   storage:
     storageClass: longhorn
 
+  # Resources - per CloudNativePG recommendations:
+  # https://cloudnative-pg.io/documentation/1.20/resource_management/
+  # Rule: container memory = 4x shared_buffers (default 128MB = 512Mi min)
+  # PRD: 1Gi allows shared_buffers up to 256MB
   resources:
     requests:
       cpu: 250m
@@ -44,6 +51,7 @@ backups:
   provider: s3
   retentionPolicy: "30d"
 
+  # Source: apps/values.yaml -> global.s3.endpoint
   endpointURL: https://4aa95df965d3bc2bfaabe9012a35857c.r2.cloudflarestorage.com
   destinationPath: s3://postgresql-backups/
 
@@ -80,6 +88,7 @@ backups:
 recovery:
   method: object_store
   provider: s3
+  # Source: apps/values.yaml -> global.s3.endpoint
   endpointURL: https://4aa95df965d3bc2bfaabe9012a35857c.r2.cloudflarestorage.com
   destinationPath: s3://postgresql-backups/
   s3:

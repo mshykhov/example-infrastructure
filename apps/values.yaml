@@ -23,6 +23,12 @@ deploy:
 # Global Configuration (shared across all apps)
 # -----------------------------------------------------------------------------
 global:
+  # Cluster identifier (used in observability labels)
+  cluster: k3s-home
+
+  # Public domain (externally accessible via Cloudflare Tunnel)
+  domain: untrustedonline.org
+
   # Tailscale
   tailnet: tail876052
   tailscale:

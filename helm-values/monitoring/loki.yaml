@@ -15,6 +15,10 @@ deploymentMode: SingleBinary
 # =============================================================================
 # LOKI CONFIGURATION
 # =============================================================================
+# NOTE: auth_enabled=false is intentional for single-tenant k3s-home cluster.
+# Loki is accessed only via Grafana (cluster-internal) or through oauth2-proxy.
+# For multi-tenant: enable auth and configure tenant IDs.
+# =============================================================================
 loki:
   auth_enabled: false
 
@@ -53,13 +57,17 @@ loki:
 singleBinary:
   replicas: 1
 
+  # Resources - Loki sizing varies by log volume
+  # https://grafana.com/docs/loki/latest/setup/size/
+  # SingleBinary for small deployments (home lab): minimal resources OK
+  # Increase if query performance degrades or OOM occurs
   resources:
     requests:
       cpu: 50m
       memory: 128Mi
     limits:
       cpu: 250m
-      memory: 256Mi
+      memory: 512Mi
 
   persistence:
     enabled: true

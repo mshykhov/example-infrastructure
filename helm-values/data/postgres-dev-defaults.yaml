@@ -3,6 +3,8 @@
 # =============================================================================
 # Applied to all PostgreSQL clusters in dev environment.
 # Service-specific values in <service>-db.yaml override these.
+#
+# S3 endpoint source: apps/values.yaml -> global.s3.endpoint
 # =============================================================================
 
 type: postgresql
@@ -16,13 +18,17 @@ cluster:
   storage:
     storageClass: longhorn
 
+  # Resources - per CloudNativePG recommendations:
+  # https://cloudnative-pg.io/documentation/1.20/resource_management/
+  # Rule: container memory = 4x shared_buffers (default 128MB = 512Mi min)
+  # DEV: minimal resources for development/testing
   resources:
     requests:
       cpu: 100m
       memory: 256Mi
     limits:
       cpu: 500m
-      memory: 512Mi
+      memory: 768Mi
 
   monitoring:
     enabled: true
@@ -39,6 +45,7 @@ backups:
   provider: s3
   retentionPolicy: "7d"
 
+  # Source: apps/values.yaml -> global.s3.endpoint
   endpointURL: https://4aa95df965d3bc2bfaabe9012a35857c.r2.cloudflarestorage.com
   destinationPath: s3://postgresql-backups/
 
@@ -75,6 +82,7 @@ backups:
 recovery:
   method: object_store
   provider: s3
+  # Source: apps/values.yaml -> global.s3.endpoint
   endpointURL: https://4aa95df965d3bc2bfaabe9012a35857c.r2.cloudflarestorage.com
   destinationPath: s3://postgresql-backups/
   s3:

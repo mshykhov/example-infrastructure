@@ -7,6 +7,12 @@ kube-prometheus-stack:
   # ===========================================================================
   # GRAFANA
   # ===========================================================================
+  # NOTE: Anonymous admin access is intentional - authentication is handled
+  # by oauth2-proxy at ingress level (protected-services chart).
+  # Internal cluster access is trusted (k3s-home single-tenant cluster).
+  # For multi-tenant or production: use ExternalSecret for adminPassword
+  # and configure proper auth via Auth0/OIDC.
+  # ===========================================================================
   grafana:
     enabled: true
     adminPassword: "admin"
@@ -43,6 +49,10 @@ kube-prometheus-stack:
 
   # ===========================================================================
   # PROMETHEUS
+  # ===========================================================================
+  # Memory sizing: ~8KB per active time series
+  # https://www.robustperception.io/how-much-ram-does-prometheus-2-x-need-for-cardinality-and-ingestion/
+  # k3s-home with ~50k series: 8KB * 50k = ~400MB, 1Gi limit provides headroom
   # ===========================================================================
   prometheus:
     enabled: true
