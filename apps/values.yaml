@@ -57,12 +57,11 @@ global:
       deploys: "10"
 
   # S3-compatible storage (Cloudflare R2)
-  # Used by: Velero, CNPG
+  # Used by: CNPG
   s3:
     endpoint: https://4aa95df965d3bc2bfaabe9012a35857c.r2.cloudflarestorage.com
     region: auto
     buckets:
-      velero: velero-backups
       cnpg: cnpg-backups
 
 

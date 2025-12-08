@@ -75,8 +75,6 @@ spec:
       server: https://kubernetes.default.svc
     - namespace: tailscale
       server: https://kubernetes.default.svc
-    - namespace: velero
-      server: https://kubernetes.default.svc
     - namespace: external-dns
       server: https://kubernetes.default.svc
   clusterResourceWhitelist:
@@ -202,20 +200,3 @@ spec:
     - group: ''
       kind: LimitRange
 
----
-apiVersion: argoproj.io/v1alpha1
-kind: AppProject
-metadata:
-  name: backup
-  namespace: argocd
-spec:
-  description: Backup and disaster recovery
-  sourceRepos:
-    - '{{ .Values.spec.source.repoURL }}'
-    - 'https://vmware-tanzu.github.io/helm-charts'
-  destinations:
-    - namespace: velero
-      server: https://kubernetes.default.svc
-  clusterResourceWhitelist:
-    - group: '*'
-      kind: '*'
