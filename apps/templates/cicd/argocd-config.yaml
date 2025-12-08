@@ -29,7 +29,7 @@ spec:
         deploy:
           repoURL: "{{ .Values.deploy.repoURL }}"
         global:
-          servicePrefix: {{ .Values.global.servicePrefix }}
+          servicePrefixes: {{ .Values.global.servicePrefixes | toYaml | nindent 12 }}
           tailnet: {{ .Values.global.tailnet }}
           auth0:
             domain: {{ .Values.global.auth0.domain }}

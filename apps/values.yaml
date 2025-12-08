@@ -23,8 +23,11 @@ deploy:
 # Global Configuration (shared across all apps)
 # -----------------------------------------------------------------------------
 global:
-  # Service namespace prefix (used in ArgoCD project destinations as {prefix}-*)
-  servicePrefix: example
+  # Service namespace prefixes (used in ArgoCD project destinations as {prefix}-*)
+  servicePrefixes:
+    - example
+    - example-api
+    - example-ui
 
   # Cluster identifier (used in observability labels)
   cluster: k3s-home
