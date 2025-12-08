@@ -25,16 +25,27 @@ kind: Ingress
 metadata:
   name: {{ $name }}-oauth2
   namespace: {{ $service.namespace }}
-  {{- if $service.hostname }}
   annotations:
-    external-dns.alpha.kubernetes.io/hostname: {{ $service.hostname }}
+    {{- /* Determine public hostname: subdomain.domain or hostname (legacy) */}}
+    {{- $publicHost := "" }}
+    {{- if hasKey $service "subdomain" }}
+      {{- if eq $service.subdomain "" }}
+        {{- $publicHost = $.Values.global.domain }}
+      {{- else }}
+        {{- $publicHost = printf "%s.%s" $service.subdomain $.Values.global.domain }}
+      {{- end }}
+    {{- else if $service.hostname }}
+      {{- $publicHost = $service.hostname }}
+    {{- end }}
+    {{- if $publicHost }}
+    external-dns.alpha.kubernetes.io/hostname: {{ $publicHost }}
     external-dns.alpha.kubernetes.io/target: {{ $.Values.global.cloudflare.tunnelId }}.cfargotunnel.com
     external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
-  {{- end }}
+    {{- end }}
 spec:
   ingressClassName: nginx
   rules:
-    - host: {{ if $service.hostname }}{{ $service.hostname }}{{ else }}{{ $name }}.{{ $.Values.global.tailnet }}.ts.net{{ end }}
+    - host: {{ if $publicHost }}{{ $publicHost }}{{ else }}{{ $name }}.{{ $.Values.global.tailnet }}.ts.net{{ end }}
       http:
         paths:
           - path: /oauth2
