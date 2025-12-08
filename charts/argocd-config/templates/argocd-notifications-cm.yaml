@@ -35,8 +35,11 @@ data:
       {{`{{- else }}`}}
       🔗 Revision: `{{`{{ $shortRev }}`}}`
       {{`{{- end }}`}}
-      {{`{{- if (call .repo.GetCommitMetadata .app.status.sync.revision).Message }}`}}
-      💬 {{`{{ (call .repo.GetCommitMetadata .app.status.sync.revision).Message | trunc 200 }}`}}
+      {{`{{- if .app.status.summary.images }}`}}
+      🐳 Images:
+      {{`{{- range $img := .app.status.summary.images }}`}}
+        • `{{`{{ $img }}`}}`
+      {{`{{- end }}`}}
       {{`{{- end }}`}}
 
       🔗 [Open in ArgoCD]({{`{{ .context.argocdUrl }}`}}/applications/{{`{{ .app.metadata.name }}`}})
