@@ -36,9 +36,19 @@ data:
       🔗 Revision: `{{`{{ $shortRev }}`}}`
       {{`{{- end }}`}}
       {{`{{- if .app.status.summary.images }}`}}
+      {{`{{- $images := .app.status.summary.images }}`}}
+      {{`{{- $imageCount := len $images }}`}}
+      {{`{{- if eq $imageCount 1 }}`}}
+      🐳 Image: `{{`{{ index $images 0 }}`}}`
+      {{`{{- else if eq $imageCount 2 }}`}}
+      🐳 Image:
+        Old: `{{`{{ index $images 0 }}`}}`
+        New: `{{`{{ index $images 1 }}`}}`
+      {{`{{- else }}`}}
       🐳 Images:
-      {{`{{- range $img := .app.status.summary.images }}`}}
+      {{`{{- range $img := $images }}`}}
         • `{{`{{ $img }}`}}`
+      {{`{{- end }}`}}
       {{`{{- end }}`}}
       {{`{{- end }}`}}
 
