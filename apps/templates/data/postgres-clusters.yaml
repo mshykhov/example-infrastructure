@@ -75,6 +75,20 @@ spec:
               - $deploy/{{`{{ .path.path }}`}}/{{`{{ .path.filename }}`}}
               # 3. Service + env config (optional, highest priority)
               - $deploy/{{`{{ .path.path }}`}}/{{`{{ trimSuffix ".yaml" .path.filename }}`}}-{{`{{ .env }}`}}.yaml
+            # S3 config from global values (highest priority)
+            values: |
+              backups:
+                endpointURL: {{ .Values.global.s3.endpoint }}
+                destinationPath: s3://{{ .Values.global.s3.buckets.cnpg }}/
+                s3:
+                  region: {{ .Values.global.s3.region }}
+                  bucket: {{ .Values.global.s3.buckets.cnpg }}
+              recovery:
+                endpointURL: {{ .Values.global.s3.endpoint }}
+                destinationPath: s3://{{ .Values.global.s3.buckets.cnpg }}/
+                s3:
+                  region: {{ .Values.global.s3.region }}
+                  bucket: {{ .Values.global.s3.buckets.cnpg }}
         - repoURL: {{ .Values.deploy.repoURL }}
           targetRevision: {{ .Values.deploy.targetRevision }}
           ref: deploy
